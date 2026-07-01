@@ -440,19 +440,15 @@
     <div class="predict-label">預測完賽時間（基於最近訓練數據）</div>
     <div class="predict-pace" id="predictHalfPace">— /km</div>
     <div class="predict-distances">
-      <div class="predict-item">
-        <div class="d">5K</div>
-        <div class="t" id="predict5k">—</div>
-      </div>
-      <div class="predict-item">
-        <div class="d">10K</div>
-        <div class="t" id="predict10k">—</div>
-      </div>
-      <div class="predict-item">
-        <div class="d">全馬</div>
-        <div class="t" id="predictMarathon">—</div>
-      </div>
-    </div>
+          <div class="predict-item">
+            <div class="d">5K</div>
+            <div class="t" id="predict5k">—</div>
+          </div>
+          <div class="predict-item">
+            <div class="d">10K</div>
+            <div class="t" id="predict10k">—</div>
+          </div>
+        </div>
   </div>
 
   <div class="grid grid-2" style="margin-top:14px">
@@ -3507,8 +3503,7 @@ function render() {
     document.getElementById('predictHalf').textContent = halfStr;
     document.getElementById('predictHalfPace').textContent = fmtPace(halfPace);
     document.getElementById('predict5k').textContent = secToTime(bestPace * 5 * 1.03);
-    document.getElementById('predict10k').textContent = secToTime(bestPace * 10 * 1.05);
-    document.getElementById('predictMarathon').textContent = secToTime(halfPace * 2 * 1.08);
+        document.getElementById('predict10k').textContent = secToTime(bestPace * 10 * 1.05);
 
     // Progress chart: show weekly avg pace + target HM pace
     new Chart(document.getElementById('progressChart'),{
