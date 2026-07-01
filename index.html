@@ -312,8 +312,205 @@
 
 <script>
 // ── Inline data ──
-const INLINE_DATA = {"generated_at":"2026-07-01","current_phase":"base","current_week_of_plan":null,"this_week":{"week_start":"2026-06-29","week_end":"2026-07-05","today":"2026-07-01","current_run_km":0,"current_gym":0,"current_longest_run_km":0,"target_run_km":45,"target_gym":2,"run_progress_pct":0,"gym_progress_pct":0},"weekly_stats":[{"week_start":"2026-06-22","week_end":"2026-06-28","total_run_km":24.6,"outdoor_km":0,"treadmill_km":24.6,"gym_sessions":0,"total_duration_min":146.9,"run_sessions":2,"longest_run_km":15.6,"target_run_km":45,"target_gym":2,"run_completion_pct":55,"gym_completion_pct":0,"activities":[{"date":"2026-06-28","type":"treadmill_running","name":"跑步機","distance_km":9.0,"duration_min":71.6,"avg_hr":null,"max_hr":null,"calories":606.0,"pace_sec_km":477.4},{"date":"2026-06-27","type":"treadmill_running","name":"跑步機","distance_km":15.59,"duration_min":75.3,"avg_hr":null,"max_hr":null,"calories":821.0,"pace_sec_km":289.7}]},{"week_start":"2026-06-15","week_end":"2026-06-21","total_run_km":38.2,"outdoor_km":13.1,"treadmill_km":25.2,"gym_sessions":1,"total_duration_min":340.1,"run_sessions":3,"longest_run_km":17.5,"target_run_km":45,"target_gym":2,"run_completion_pct":85,"gym_completion_pct":50,"activities":[{"date":"2026-06-21","type":"running","name":"九龍 跑步","distance_km":13.07,"duration_min":112.2,"avg_hr":null,"max_hr":null,"calories":903.0,"pace_sec_km":514.9},{"date":"2026-06-20","type":"strength_training","name":"肌力訓練","distance_km":0.0,"duration_min":107.4,"avg_hr":null,"max_hr":null,"calories":632.0,"pace_sec_km":null},{"date":"2026-06-20","type":"treadmill_running","name":"跑步機","distance_km":17.51,"duration_min":81.6,"avg_hr":null,"max_hr":null,"calories":862.0,"pace_sec_km":279.8},{"date":"2026-06-19","type":"treadmill_running","name":"跑步機","distance_km":7.67,"duration_min":38.9,"avg_hr":null,"max_hr":null,"calories":361.0,"pace_sec_km":303.9}]},{"week_start":"2026-06-08","week_end":"2026-06-14","total_run_km":10.0,"outdoor_km":10.0,"treadmill_km":0,"gym_sessions":0,"total_duration_min":63.2,"run_sessions":1,"longest_run_km":10.0,"target_run_km":45,"target_gym":2,"run_completion_pct":22,"gym_completion_pct":0,"activities":[{"date":"2026-06-11","type":"running","name":"九龍 跑步","distance_km":10.03,"duration_min":63.2,"avg_hr":null,"max_hr":null,"calories":800.0,"pace_sec_km":377.8}]},{"week_start":"2026-06-01","week_end":"2026-06-07","total_run_km":6.5,"outdoor_km":0,"treadmill_km":6.5,"gym_sessions":0,"total_duration_min":47.7,"run_sessions":1,"longest_run_km":6.5,"target_run_km":45,"target_gym":2,"run_completion_pct":14,"gym_completion_pct":0,"activities":[{"date":"2026-06-06","type":"treadmill_running","name":"跑步機","distance_km":6.48,"duration_min":47.7,"avg_hr":null,"max_hr":null,"calories":489.0,"pace_sec_km":441.3}]}],"goal":{"type":"half_marathon","distance_km":21.1,"target_month":"Dec 2026","months_remaining":5},"user":{"age":33,"weight_kg":76.5,"vo2max":50}};
-const INLINE_PLAN = {"generated_at":"2026-07-01","next_week_plan":{"run_km":35,"gym_sessions":2,"long_run":16,"focus":"穩定 aerobic base，補返 gym 強度訓練，逐步建立訓練習慣","ai_reasoning":"上週完成率55%（24.6km/45km），低於60%閾值。連續兩週下降趨勢（85%→55%），不宜加量。建議降低目標至35km貼近實際能力，重建完成信心後再加。Gym方面連續兩週未達標（50%→0%），必須特別關注。長課由上週15.6km微增至16km，輕微進步已足夠。","weekly_schedule":"週二: 10km easy treadmill · 週三: Gym 肌力訓練 · 週四: 9km easy 戶外 · 週六: 長課 16km progressive (treadmill/戶外) · 週日: Gym 肌力訓練 + 休息"},"phase":"base","notes":"6月頭跑量好低（6.5km/10km），但月中明顯進步（38.2km/24.6km）。上週回落係因為跑咗2次而唔係3次，長課15.6km其實有進步（之前最長17.5km）。Base階段目標係每週穩定30-40km、保持2-3次跑步+2次gym。仲有5個月到Dec半馬，時間好充足，最緊要係 consistent 唔好受傷。Sub-1:50半馬（5:13/km配速）以你VO2max 50同而家10k pace (~6:17/km)泥講完全可行，base phase 做好 aerobic base 之後再加 speed work 就得。"};
+const INLINE_DATA = {
+  "generated_at": "2026-07-01",
+  "current_phase": "base",
+  "current_week_of_plan": null,
+  "this_week": {
+    "week_start": "2026-06-29",
+    "week_end": "2026-07-05",
+    "today": "2026-07-01",
+    "current_run_km": 0,
+    "current_gym": 0,
+    "current_longest_run_km": 0,
+    "target_run_km": 45,
+    "target_gym": 2,
+    "run_progress_pct": 0,
+    "gym_progress_pct": 0
+  },
+  "weekly_stats": [
+    {
+      "week_start": "2026-06-22",
+      "week_end": "2026-06-28",
+      "total_run_km": 24.6,
+      "outdoor_km": 0,
+      "treadmill_km": 24.6,
+      "gym_sessions": 0,
+      "total_duration_min": 146.9,
+      "run_sessions": 2,
+      "longest_run_km": 15.6,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 55,
+      "gym_completion_pct": 0,
+      "activities": [
+        {
+          "date": "2026-06-28",
+          "type": "treadmill_running",
+          "name": "跑步機",
+          "distance_km": 9.0,
+          "duration_min": 71.6,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 606.0,
+          "pace_sec_km": 477.4
+        },
+        {
+          "date": "2026-06-27",
+          "type": "treadmill_running",
+          "name": "跑步機",
+          "distance_km": 15.59,
+          "duration_min": 75.3,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 821.0,
+          "pace_sec_km": 289.7
+        }
+      ]
+    },
+    {
+      "week_start": "2026-06-15",
+      "week_end": "2026-06-21",
+      "total_run_km": 38.2,
+      "outdoor_km": 13.1,
+      "treadmill_km": 25.2,
+      "gym_sessions": 1,
+      "total_duration_min": 340.1,
+      "run_sessions": 3,
+      "longest_run_km": 17.5,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 85,
+      "gym_completion_pct": 50,
+      "activities": [
+        {
+          "date": "2026-06-21",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 13.07,
+          "duration_min": 112.2,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 903.0,
+          "pace_sec_km": 514.9
+        },
+        {
+          "date": "2026-06-20",
+          "type": "strength_training",
+          "name": "肌力訓練",
+          "distance_km": 0.0,
+          "duration_min": 107.4,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 632.0,
+          "pace_sec_km": null
+        },
+        {
+          "date": "2026-06-20",
+          "type": "treadmill_running",
+          "name": "跑步機",
+          "distance_km": 17.51,
+          "duration_min": 81.6,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 862.0,
+          "pace_sec_km": 279.8
+        },
+        {
+          "date": "2026-06-19",
+          "type": "treadmill_running",
+          "name": "跑步機",
+          "distance_km": 7.67,
+          "duration_min": 38.9,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 361.0,
+          "pace_sec_km": 303.9
+        }
+      ]
+    },
+    {
+      "week_start": "2026-06-08",
+      "week_end": "2026-06-14",
+      "total_run_km": 10.0,
+      "outdoor_km": 10.0,
+      "treadmill_km": 0,
+      "gym_sessions": 0,
+      "total_duration_min": 63.2,
+      "run_sessions": 1,
+      "longest_run_km": 10.0,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 22,
+      "gym_completion_pct": 0,
+      "activities": [
+        {
+          "date": "2026-06-11",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 10.03,
+          "duration_min": 63.2,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 800.0,
+          "pace_sec_km": 377.8
+        }
+      ]
+    },
+    {
+      "week_start": "2026-06-01",
+      "week_end": "2026-06-07",
+      "total_run_km": 6.5,
+      "outdoor_km": 0,
+      "treadmill_km": 6.5,
+      "gym_sessions": 0,
+      "total_duration_min": 47.7,
+      "run_sessions": 1,
+      "longest_run_km": 6.5,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 14,
+      "gym_completion_pct": 0,
+      "activities": [
+        {
+          "date": "2026-06-06",
+          "type": "treadmill_running",
+          "name": "跑步機",
+          "distance_km": 6.48,
+          "duration_min": 47.7,
+          "avg_hr": null,
+          "max_hr": null,
+          "calories": 489.0,
+          "pace_sec_km": 441.3
+        }
+      ]
+    }
+  ],
+  "goal": {
+    "type": "half_marathon",
+    "distance_km": 21.1,
+    "target_month": "Dec 2026",
+    "months_remaining": 5
+  },
+  "user": {
+    "age": 33,
+    "weight_kg": 76.5,
+    "vo2max": 50
+  }
+};
+const INLINE_PLAN = {
+  "generated_at": "2026-07-01",
+  "next_week_plan": {
+    "run_km": 35,
+    "gym_sessions": 2,
+    "long_run": 16,
+    "focus": "穩定 aerobic base，補返 gym 強度訓練，逐步建立訓練習慣",
+    "ai_reasoning": "上週完成率55%（24.6km/45km），低於60%閾值。連續兩週下降趨勢（85%→55%），不宜加量。建議降低目標至35km貼近實際能力，重建完成信心後再加。Gym方面連續兩週未達標（50%→0%），必須特別關注。長課由上週15.6km微增至16km，輕微進步已足夠。",
+    "weekly_schedule": "週二: 10km easy treadmill · 週三: Gym 肌力訓練 · 週四: 9km easy 戶外 · 週六: 長課 16km progressive (treadmill/戶外) · 週日: Gym 肌力訓練 + 休息"
+  },
+  "phase": "base",
+  "notes": "6月頭跑量好低（6.5km/10km），但月中明顯進步（38.2km/24.6km）。上週回落係因為跑咗2次而唔係3次，長課15.6km其實有進步（之前最長17.5km）。Base階段目標係每週穩定30-40km、保持2-3次跑步+2次gym。仲有5個月到Dec半馬，時間好充足，最緊要係 consistent 唔好受傷。Sub-1:50半馬（5:13/km配速）以你VO2max 50同而家10k pace (~6:17/km)泥講完全可行，base phase 做好 aerobic base 之後再加 speed work 就得。"
+};
 
 // ── Helper ──
 function fmtPace(s) { const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; }
