@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🏃 Hermes Training</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #13151e;
+    --surface2: #1c1f2e;
+    --surface3: #262a3e;
+    --border: #2a2e42;
+    --border2: #363a52;
+    --text: #edf0f7;
+    --text2: #8b8fa3;
+    --text3: #5c6070;
+    --accent: #60a5fa;
+    --accent2: #34d399;
+    --accent3: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --orange: #fb923c;
+    --cyan: #22d3ee;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 20px 16px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; }
+  .header h1 span { color: var(--accent); }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .phase-badge {
+    background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(52,211,153,0.1));
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    color: var(--accent2); border: 1px solid rgba(52,211,153,0.2);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .phase-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); display: inline-block; }
+  .goal-badge {
+    background: var(--surface2); padding: 6px 12px; border-radius: 20px;
+    font-size: 11px; color: var(--text2); border: 1px solid var(--border);
+  }
+  .goal-badge strong { color: var(--text); }
+
+  /* ── Grid ── */
+  .grid { display: grid; gap: 14px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 20px; border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text2); margin-bottom: 10px; font-weight: 600;
+  }
+
+  /* ── Stat Card ── */
+  .stat-card { position: relative; overflow: hidden; }
+  .stat-card::after {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 80px; height: 80px; border-radius: 50%;
+    opacity: 0.04; transform: translate(20px, -20px);
+    background: radial-gradient(circle, var(--accent), transparent);
+  }
+  .stat-card.gym-card::after { background: radial-gradient(circle, var(--purple), transparent); }
+  .stat-card.score-card::after { background: radial-gradient(circle, var(--accent3), transparent); }
+  .stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+  .stat-value .unit { font-size: 14px; font-weight: 600; color: var(--text2); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .progress-bar { height: 6px; background: var(--surface2); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .progress-fill {
+    height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+  }
+  .progress-fill.gym { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+  .progress-fill.over { background: linear-gradient(90deg, var(--accent3), var(--orange)); }
+
+  /* ── Today Status ── */
+  .today-card .today-date { font-size: 14px; color: var(--text2); margin-bottom: 2px; }
+  .today-card .today-big { font-size: 13px; color: var(--text3); }
+  .today-card .week-progress { margin-top: 12px; }
+  .today-card .week-dot-row { display: flex; gap: 6px; margin-top: 6px; }
+  .week-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--text3); transition: all 0.3s;
+  }
+  .week-dot.today { border-color: var(--accent); color: var(--accent); background: rgba(96,165,250,0.1); }
+  .week-dot.done { background: rgba(52,211,153,0.15); border-color: var(--accent2); color: var(--accent2); }
+  .week-dot.gym-done { background: rgba(167,139,250,0.15); border-color: var(--purple); color: var(--purple); }
+
+  /* ── Chart ── */
+  .chart-container { height: 240px; position: relative; }
+
+  /* ── AI Card ── */
+  .ai-card {
+    background: linear-gradient(135deg, rgba(96,165,250,0.06), rgba(52,211,153,0.06));
+    border: 1px solid rgba(96,165,250,0.15);
+    border-radius: var(--radius);
+  }
+  .ai-card:hover { border-color: rgba(96,165,250,0.3); }
+  .ai-label {
+    font-size: 11px; color: var(--accent); letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .ai-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .ai-grid { grid-template-columns: 1fr; } }
+  .ai-metric {
+    background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);
+    padding: 12px; text-align: center; border: 1px solid rgba(96,165,250,0.08);
+  }
+  .ai-metric .num { font-size: 22px; font-weight: 800; color: var(--accent); }
+  .ai-metric .num.gym-num { color: var(--purple); }
+  .ai-metric .num.long-num { color: var(--accent3); }
+  .ai-metric .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .ai-reasoning {
+    font-size: 13px; line-height: 1.7; color: var(--text2);
+    padding: 12px; background: rgba(0,0,0,0.15);
+    border-radius: var(--radius-sm); border-left: 3px solid var(--accent);
+  }
+  .ai-reasoning strong { color: var(--text); }
+  .ai-focus {
+    display: inline-block; margin-top: 10px;
+    background: rgba(96,165,250,0.1); padding: 6px 14px;
+    border-radius: 20px; font-size: 12px; color: var(--accent);
+    border: 1px solid rgba(96,165,250,0.15);
+  }
+
+  /* ── Activity ── */
+  .activity-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    transition: background 0.15s; border-radius: var(--radius-sm);
+  }
+  .activity-row:last-child { border: none; }
+  .activity-row:hover { background: rgba(255,255,255,0.02); }
+  .activity-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--surface2); display: flex; align-items: center;
+    justify-content: center; font-size: 16px; flex-shrink: 0;
+  }
+  .activity-info { flex: 1; min-width: 0; }
+  .activity-name { font-size: 14px; font-weight: 600; }
+  .activity-meta { font-size: 12px; color: var(--text2); }
+  .activity-stats { text-align: right; font-size: 15px; font-weight: 700; font-family: var(--mono); }
+  .activity-stats .unit { font-size: 11px; font-weight: 400; color: var(--text2); }
+  .activity-stats small { font-size: 11px; color: var(--text3); font-weight: 400; display: block; }
+
+  /* ── Week Table ── */
+  .week-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .week-table th {
+    text-align: left; color: var(--text2); font-weight: 500;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 8px 6px; border-bottom: 1px solid var(--border);
+  }
+  .week-table td { padding: 10px 6px; border-bottom: 1px solid var(--border); }
+  .week-table tr:last-child td { border: none; }
+  .week-table td:first-child { font-weight: 600; color: var(--text2); }
+  .week-table td:nth-child(2) { font-weight: 700; font-family: var(--mono); }
+  .badge {
+    display: inline-flex; align-items: center; gap: 2px;
+    padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700;
+  }
+  .badge-yes { background: rgba(52,211,153,0.15); color: var(--accent2); }
+  .badge-no { background: rgba(248,113,113,0.12); color: var(--red); }
+  .badge-warn { background: rgba(251,191,36,0.12); color: var(--accent3); }
+
+  /* ── Loading ── */
+  .loading { text-align: center; padding: 80px 20px; }
+  .loading .spinner {
+    width: 32px; height: 32px; border: 3px solid var(--surface2);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading p { color: var(--text2); font-size: 14px; }
+
+  /* ── Responsive tweaks ── */
+  @media (max-width: 640px) {
+    body { padding: 12px 10px 30px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .header-right { width: 100%; justify-content: flex-start; }
+    .stat-value { font-size: 24px; }
+    .ai-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🏃 Hermes <span>Training</span></h1>
+  </div>
+  <div class="header-right">
+    <span class="goal-badge">🎯 半馬 sub-<strong>1:50</strong> · <strong id="monthsLeft">5</strong> 個月</span>
+    <span class="phase-badge" id="phaseBadge">Base Phase</span>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="grid grid-4" id="statCards">
+  <div class="card today-card stat-card">
+    <div class="card-title">📅 今日</div>
+    <div class="today-date" id="todayDate">—</div>
+    <div class="today-big" id="todayPhase">—</div>
+    <div class="week-progress">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">本週進度</div>
+      <div class="week-dot-row" id="weekDots">
+        <div class="week-dot">一</div>
+        <div class="week-dot">二</div>
+        <div class="week-dot">三</div>
+        <div class="week-dot">四</div>
+        <div class="week-dot">五</div>
+        <div class="week-dot">六</div>
+        <div class="week-dot">日</div>
+      </div>
+    </div>
+  </div>
+  <div class="card stat-card">
+    <div class="card-title">🏃 本週跑量</div>
+    <div class="stat-value"><span id="weekRun">0</span><span class="unit"> km</span></div>
+    <div class="stat-label">目標 <span id="runTarget">45</span> km</div>
+    <div class="progress-bar"><div class="progress-fill" id="runProgress" style="width:0%"></div></div>
+  </div>
+  <div class="card stat-card gym-card">
+    <div class="card-title">💪 本週 Gym</div>
+    <div class="stat-value"><span id="weekGym">0</span><span class="unit">x</span></div>
+    <div class="stat-label">目標 <span id="gymTarget">2</span> 次</div>
+    <div class="progress-bar"><div class="progress-fill gym" id="gymProgress" style="width:0%"></div></div>
+  </div>
+  <div class="card stat-card score-card">
+    <div class="card-title">📊 完成度</div>
+    <div class="stat-value"><span id="completionScore">0</span><span class="unit">%</span></div>
+    <div class="stat-label" id="completionLabel">—</div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid grid-2" style="margin-top:14px">
+  <div class="card">
+    <div class="card-title">📈 每週跑量趨勢</div>
+    <div class="chart-container"><canvas id="weeklyChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 每週完成率</div>
+    <div class="chart-container"><canvas id="completionChart"></canvas></div>
+  </div>
+</div>
+
+<!-- AI 訓練建議 -->
+<div class="card ai-card" style="margin-top:14px" id="aiSuggestion">
+  <div class="ai-label">🤖 AI 訓練建議</div>
+  <div id="aiContent">載入中...</div>
+</div>
+
+<!-- 最近活動 -->
+<div class="card" style="margin-top:14px">
+  <div class="card-title">🏃 最近活動</div>
+  <div id="activityList"><p style="color:var(--text2);font-size:13px">載入中...</p></div>
+</div>
+
+<!-- 每週詳細 -->
+<div class="card" style="margin-top:14px">
+  <div class="card-title">📋 每週詳細</div>
+  <div style="overflow-x:auto">
+    <table class="week-table">
+      <thead><tr><th>週</th><th>跑量</th><th>次數</th><th>長課</th><th>Gym</th><th>達成</th></tr></thead>
+      <tbody id="weekTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ── Inline data ──
+const INLINE_DATA = {"generated_at":"2026-07-01","current_phase":"base","current_week_of_plan":null,"this_week":{"week_start":"2026-06-29","week_end":"2026-07-05","today":"2026-07-01","current_run_km":0,"current_gym":0,"current_longest_run_km":0,"target_run_km":45,"target_gym":2,"run_progress_pct":0,"gym_progress_pct":0},"weekly_stats":[{"week_start":"2026-06-22","week_end":"2026-06-28","total_run_km":24.6,"outdoor_km":0,"treadmill_km":24.6,"gym_sessions":0,"total_duration_min":146.9,"run_sessions":2,"longest_run_km":15.6,"target_run_km":45,"target_gym":2,"run_completion_pct":55,"gym_completion_pct":0,"activities":[{"date":"2026-06-28","type":"treadmill_running","name":"跑步機","distance_km":9.0,"duration_min":71.6,"avg_hr":null,"max_hr":null,"calories":606.0,"pace_sec_km":477.4},{"date":"2026-06-27","type":"treadmill_running","name":"跑步機","distance_km":15.59,"duration_min":75.3,"avg_hr":null,"max_hr":null,"calories":821.0,"pace_sec_km":289.7}]},{"week_start":"2026-06-15","week_end":"2026-06-21","total_run_km":38.2,"outdoor_km":13.1,"treadmill_km":25.2,"gym_sessions":1,"total_duration_min":340.1,"run_sessions":3,"longest_run_km":17.5,"target_run_km":45,"target_gym":2,"run_completion_pct":85,"gym_completion_pct":50,"activities":[{"date":"2026-06-21","type":"running","name":"九龍 跑步","distance_km":13.07,"duration_min":112.2,"avg_hr":null,"max_hr":null,"calories":903.0,"pace_sec_km":514.9},{"date":"2026-06-20","type":"strength_training","name":"肌力訓練","distance_km":0.0,"duration_min":107.4,"avg_hr":null,"max_hr":null,"calories":632.0,"pace_sec_km":null},{"date":"2026-06-20","type":"treadmill_running","name":"跑步機","distance_km":17.51,"duration_min":81.6,"avg_hr":null,"max_hr":null,"calories":862.0,"pace_sec_km":279.8},{"date":"2026-06-19","type":"treadmill_running","name":"跑步機","distance_km":7.67,"duration_min":38.9,"avg_hr":null,"max_hr":null,"calories":361.0,"pace_sec_km":303.9}]},{"week_start":"2026-06-08","week_end":"2026-06-14","total_run_km":10.0,"outdoor_km":10.0,"treadmill_km":0,"gym_sessions":0,"total_duration_min":63.2,"run_sessions":1,"longest_run_km":10.0,"target_run_km":45,"target_gym":2,"run_completion_pct":22,"gym_completion_pct":0,"activities":[{"date":"2026-06-11","type":"running","name":"九龍 跑步","distance_km":10.03,"duration_min":63.2,"avg_hr":null,"max_hr":null,"calories":800.0,"pace_sec_km":377.8}]},{"week_start":"2026-06-01","week_end":"2026-06-07","total_run_km":6.5,"outdoor_km":0,"treadmill_km":6.5,"gym_sessions":0,"total_duration_min":47.7,"run_sessions":1,"longest_run_km":6.5,"target_run_km":45,"target_gym":2,"run_completion_pct":14,"gym_completion_pct":0,"activities":[{"date":"2026-06-06","type":"treadmill_running","name":"跑步機","distance_km":6.48,"duration_min":47.7,"avg_hr":null,"max_hr":null,"calories":489.0,"pace_sec_km":441.3}]}],"goal":{"type":"half_marathon","distance_km":21.1,"target_month":"Dec 2026","months_remaining":5},"user":{"age":33,"weight_kg":76.5,"vo2max":50}};
+const INLINE_PLAN = {"generated_at":"2026-07-01","next_week_plan":{"run_km":35,"gym_sessions":2,"long_run":16,"focus":"穩定 aerobic base，補返 gym 強度訓練，逐步建立訓練習慣","ai_reasoning":"上週完成率55%（24.6km/45km），低於60%閾值。連續兩週下降趨勢（85%→55%），不宜加量。建議降低目標至35km貼近實際能力，重建完成信心後再加。Gym方面連續兩週未達標（50%→0%），必須特別關注。長課由上週15.6km微增至16km，輕微進步已足夠。","weekly_schedule":"週二: 10km easy treadmill · 週三: Gym 肌力訓練 · 週四: 9km easy 戶外 · 週六: 長課 16km progressive (treadmill/戶外) · 週日: Gym 肌力訓練 + 休息"},"phase":"base","notes":"6月頭跑量好低（6.5km/10km），但月中明顯進步（38.2km/24.6km）。上週回落係因為跑咗2次而唔係3次，長課15.6km其實有進步（之前最長17.5km）。Base階段目標係每週穩定30-40km、保持2-3次跑步+2次gym。仲有5個月到Dec半馬，時間好充足，最緊要係 consistent 唔好受傷。Sub-1:50半馬（5:13/km配速）以你VO2max 50同而家10k pace (~6:17/km)泥講完全可行，base phase 做好 aerobic base 之後再加 speed work 就得。"};
+
+// ── Helper ──
+function fmtPace(s) { const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; }
+
+// ── Render ──
+function render() {
+  const d = INLINE_DATA, p = INLINE_PLAN;
+  const w = d.this_week, ws = d.weekly_stats;
+
+  // Phase badge
+  const pn = { base:'Base · 累積里數', build:'Build · 速度訓練', peak:'Peak · 比賽配速', taper:'Taper · 減量休息' };
+  document.getElementById('phaseBadge').textContent = pn[d.current_phase] || d.current_phase;
+  document.getElementById('monthsLeft').textContent = d.goal.months_remaining;
+
+  // Today
+  document.getElementById('todayDate').textContent = w.today;
+  const wd = ['日','一','二','三','四','五','六'];
+  const dt = new Date(w.today);
+  document.getElementById('todayPhase').textContent = '週'+wd[dt.getDay()]+' · Week '+Math.ceil((dt-new Date('2026-06-01'))/(7*86400000));
+
+  // Week dots (Mon=0..Sun=6)
+  const dots = document.querySelectorAll('.week-dot');
+  const dotToday = dt.getDay()===0?6:dt.getDay()-1; // 0=Mon
+  const dotNames = ['一','二','三','四','五','六','日'];
+  // Determine which days have activities this week
+  const thisWeekActs = ws.length>0 ? ws[0].activities : [];
+  const actDays = new Set();
+  for (const a of thisWeekActs) {
+    const ad = new Date(a.date);
+    const dIdx = ad.getDay()===0?6:ad.getDay()-1;
+    actDays.add(dIdx);
+  }
+  // Track gym days separately
+  const gymDays = new Set();
+  for (const a of thisWeekActs) {
+    if (a.type==='strength_training') {
+      const ad = new Date(a.date);
+      gymDays.add(ad.getDay()===0?6:ad.getDay()-1);
+    }
+  }
+  dots.forEach((dot,i)=>{
+    dot.textContent = dotNames[i];
+    dot.className = 'week-dot';
+    if (i===dotToday) dot.classList.add('today');
+    if (actDays.has(i) && i!==dotToday) dot.classList.add('done');
+    if (gymDays.has(i)) dot.classList.add('gym-done');
+  });
+
+  // Stats
+  document.getElementById('weekRun').textContent = w.current_run_km;
+  document.getElementById('runTarget').textContent = w.target_run_km;
+  document.getElementById('runProgress').style.width = w.run_progress_pct+'%';
+  if (w.run_progress_pct>=100) document.getElementById('runProgress').classList.add('over');
+
+  document.getElementById('weekGym').textContent = w.current_gym;
+  document.getElementById('gymTarget').textContent = w.target_gym;
+  document.getElementById('gymProgress').style.width = w.gym_progress_pct+'%';
+
+  const score = Math.round((w.run_progress_pct+w.gym_progress_pct)/2);
+  document.getElementById('completionScore').textContent = score;
+  const sl = score>80?'🔥 超標！':score>60?'👍 做得好':score>30?'💪 努力中':'❄️ 加油呀';
+  document.getElementById('completionLabel').textContent = sl;
+
+  // ── Weekly mileage chart ──
+  const rev = [...ws].reverse();
+  const lbls = rev.map(s=>s.week_start.slice(5));
+  new Chart(document.getElementById('weeklyChart'),{
+    type:'bar',
+    data:{
+      labels:lbls,
+      datasets:[
+        { label:'跑步機', data:rev.map(s=>s.treadmill_km), backgroundColor:'rgba(96,165,250,0.6)', borderRadius:4, barPercentage:0.6 },
+        { label:'戶外', data:rev.map(s=>s.outdoor_km), backgroundColor:'rgba(52,211,153,0.6)', borderRadius:4, barPercentage:0.6 },
+        { label:'目標', data:rev.map(s=>s.target_run_km), type:'line', borderColor:'rgba(251,191,36,0.5)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#8b8fa3', font:{size:11} } } },
+      scales:{
+        x:{ stacked:true, ticks:{ color:'#8b8fa3', font:{size:11} }, grid:{ color:'rgba(42,46,66,0.3)' } },
+        y:{ stacked:true, beginAtZero:true, ticks:{ color:'#8b8fa3', font:{size:11} }, grid:{ color:'rgba(42,46,66,0.3)' } }
+      }
+    }
+  });
+
+  // ── Completion radar ──
+  const pv = ws.length>1 ? ws[1] : null;
+  const lw = pv ? [pv.run_completion_pct, pv.gym_completion_pct, Math.round(pv.longest_run_km/20*100)] : [0,0,0];
+  const tw = [w.run_progress_pct, w.gym_progress_pct, Math.round(w.current_longest_run_km/20*100)];
+  new Chart(document.getElementById('completionChart'),{
+    type:'radar',
+    data:{
+      labels:['🏃 跑量','💪 Gym','📏 長課'],
+      datasets:[
+        { label:'上週', data:lw, borderColor:'rgba(167,139,250,0.6)', backgroundColor:'rgba(167,139,250,0.08)', pointBackgroundColor:'#a78bfa', pointBorderColor:'transparent', borderWidth:2 },
+        { label:'本週', data:tw, borderColor:'rgba(96,165,250,0.6)', backgroundColor:'rgba(96,165,250,0.08)', pointBackgroundColor:'#60a5fa', pointBorderColor:'transparent', borderWidth:2 }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#8b8fa3', font:{size:11} } } },
+      scales:{ r:{ ticks:{ color:'#8b8fa3', backdropColor:'transparent', font:{size:10}, stepSize:25 }, grid:{ color:'rgba(42,46,66,0.4)' }, angleLines:{ color:'rgba(42,46,66,0.4)' }, pointLabels:{ color:'#edf0f7', font:{size:12,weight:'600'} }, suggestedMax:100, beginAtZero:true } }
+    }
+  });
+
+  // ── AI suggestion ──
+  const aiEl = document.getElementById('aiContent');
+  if (p && p.next_week_plan) {
+    const n = p.next_week_plan;
+    aiEl.innerHTML = `
+      <div class="ai-grid">
+        <div class="ai-metric"><div class="num">${n.run_km}<span style="font-size:13px;color:var(--text2)">km</span></div><div class="lbl">🏃 下週跑量</div></div>
+        <div class="ai-metric"><div class="num gym-num">${n.gym_sessions}<span style="font-size:13px;color:var(--text2)">x</span></div><div class="lbl">💪 Gym 次數</div></div>
+        <div class="ai-metric"><div class="num long-num">${n.long_run}<span style="font-size:13px;color:var(--text2)">km</span></div><div class="lbl">📏 長課距離</div></div>
+      </div>
+      <div class="ai-reasoning">
+        <strong>📝 AI 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}
+      </div>
+      <div class="ai-focus">🎯 ${n.focus || '繼續累積里數'}</div>
+      ${n.weekly_schedule ? '<div style="margin-top:10px;font-size:12px;color:var(--text2);padding:8px 12px;background:rgba(0,0,0,0.1);border-radius:6px">📅 '+n.weekly_schedule+'</div>' : ''}
+    `;
+  }
+
+  // ── Activities ──
+  const all = ws.flatMap(s=>s.activities).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+  const icons = { running:'🏃', treadmill_running:'🏃', strength_training:'💪', cycling:'🚴', walking:'🚶', swimming:'🏊' };
+  const typeNames = { running:'戶外跑', treadmill_running:'跑步機', strength_training:'肌力訓練', cycling:'踩單車', walking:'散步', swimming:'游水' };
+  document.getElementById('activityList').innerHTML = all.map(a=>{
+    const icon = icons[a.type]||'🏃';
+    const tn = typeNames[a.type]||a.type;
+    const pace = a.pace_sec_km ? fmtPace(a.pace_sec_km) : '';
+    return `<div class="activity-row">
+      <div class="activity-icon">${icon}</div>
+      <div class="activity-info">
+        <div class="activity-name">${a.name||tn}</div>
+        <div class="activity-meta">${a.date} ${pace?'· '+pace:''}</div>
+      </div>
+      ${a.distance_km>0
+        ? `<div class="activity-stats">${a.distance_km}<span class="unit">km</span><small>${a.duration_min}min</small></div>`
+        : `<div class="activity-stats">—<small>${a.duration_min}min</small></div>`}
+    </div>`;
+  }).join('');
+
+  // ── Week table ──
+  document.getElementById('weekTableBody').innerHTML = ws.map(s=>{
+    const rOk = s.run_completion_pct>=85;
+    const gOk = s.gym_sessions>=2;
+    const b = (rOk?'<span class="badge badge-yes">🏃✓</span>':'<span class="badge badge-no">🏃✗</span>')+' '+(gOk?'<span class="badge badge-yes">💪✓</span>':'<span class="badge badge-no">💪✗</span>');
+    return `<tr><td>${s.week_start.slice(5)}</td><td>${s.total_run_km}<span style="font-weight:400;color:var(--text3);font-size:11px"> km</span></td><td>${s.run_sessions}x</td><td>${s.longest_run_km}<span style="font-weight:400;color:var(--text3);font-size:11px"> km</span></td><td>${s.gym_sessions}x</td><td>${b}</td></tr>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
