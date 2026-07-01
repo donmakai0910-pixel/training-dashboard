@@ -2071,9 +2071,9 @@ function render() {
   document.getElementById('trendAnalysis').innerHTML = trend;
 
   // ── TAB 4: Race Predictor ──
-    // Estimate HM pace from recent running data
-    // Use average pace of all runs (not just best) - more realistic for HM
-    const allPaces = paces.filter(p => p > 0);
+      // Estimate HM pace from recent running data
+      const sortedPaces = [...paces].sort((a,b)=>a-b);
+      const allPaces = paces.filter(p => p > 0);
     const avgPaceSec = allPaces.length > 0 ? allPaces.reduce((a,b)=>a+b,0)/allPaces.length : 320;
     const bestPace = sortedPaces.length >= 3 
       ? sortedPaces.slice(0,3).reduce((a,b)=>a+b,0)/3 
