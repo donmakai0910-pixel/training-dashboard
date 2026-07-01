@@ -3,315 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>🏃 Hermes Training</title>
+<title>🏃 Running Coach Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0b0f;
-    --surface: #13151e;
-    --surface2: #1c1f2e;
-    --surface3: #262a3e;
-    --border: #2a2e42;
-    --border2: #363a52;
-    --text: #edf0f7;
-    --text2: #8b8fa3;
-    --text3: #5c6070;
-    --accent: #60a5fa;
-    --accent2: #34d399;
-    --accent3: #fbbf24;
-    --red: #f87171;
-    --purple: #a78bfa;
-    --pink: #f472b6;
-    --orange: #fb923c;
-    --cyan: #22d3ee;
+    --bg: #08090e;
+    --surface: #11131e;
+    --surface2: #191c2c;
+    --surface3: #22263b;
+    --border: #252940;
+    --border2: #30344e;
+    --text: #e8ebf2;
+    --text2: #7e8299;
+    --text3: #535770;
+    --accent: #4f8cf7;
+    --accent2: #3bce8a;
+    --accent3: #f5b642;
+    --red: #f06565;
+    --red2: #ff4757;
+    --purple: #8b6cf7;
+    --pink: #f06bc0;
+    --orange: #ff8c42;
+    --cyan: #3bd4e0;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --mono: 'JetBrains Mono', 'SF Mono', monospace;
-    --radius: 12px;
+    --radius: 14px;
     --radius-sm: 8px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font);
-    padding: 20px 16px 40px;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 0 0 60px;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  /* ── Header ── */
-  .header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 0 16px; border-bottom: 1px solid var(--border); margin-bottom: 24px;
+  /* ── Top Nav ── */
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
   }
-  .header-left { display: flex; align-items: center; gap: 12px; }
-  .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.3px; }
-  .header h1 span { color: var(--accent); }
-  .header-right { display: flex; align-items: center; gap: 10px; }
-  .phase-badge {
-    background: linear-gradient(135deg, rgba(96,165,250,0.1), rgba(52,211,153,0.1));
-    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-    color: var(--accent2); border: 1px solid rgba(52,211,153,0.2);
-    display: flex; align-items: center; gap: 6px;
+  .top-bar h1 { font-size: 18px; font-weight: 800; }
+  .top-bar h1 span { color: var(--accent); }
+  .top-right { display: flex; align-items: center; gap: 12px; }
+  .phase-chip {
+    background: linear-gradient(135deg, rgba(59,206,138,0.12), rgba(79,140,247,0.08));
+    padding: 5px 12px; border-radius: 16px; font-size: 11px; font-weight: 600;
+    color: var(--accent2); border: 1px solid rgba(59,206,138,0.2);
   }
-  .phase-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); display: inline-block; }
-  .goal-badge {
-    background: var(--surface2); padding: 6px 12px; border-radius: 20px;
+  .goal-chip {
+    background: var(--surface2); padding: 5px 10px; border-radius: 16px;
     font-size: 11px; color: var(--text2); border: 1px solid var(--border);
   }
-  .goal-badge strong { color: var(--text); }
+  .goal-chip strong { color: var(--accent3); }
 
-  /* ── Grid ── */
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; gap: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    overflow-x: auto;
+    position: sticky;
+    top: 56px;
+    z-index: 99;
+    backdrop-filter: blur(12px);
+  }
+  .tabs::-webkit-scrollbar { height: 0; }
+  .tab-btn {
+    padding: 14px 18px; font-size: 13px; font-weight: 600;
+    color: var(--text3); border: none; background: none;
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+    font-family: var(--font);
+  }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; padding: 20px 16px; max-width: 1200px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* ── Grids ── */
   .grid { display: grid; gap: 14px; }
   .grid-4 { grid-template-columns: repeat(4, 1fr); }
   .grid-3 { grid-template-columns: repeat(3, 1fr); }
   .grid-2 { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 640px) { .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+  .grid-2-1 { grid-template-columns: 2fr 1fr; }
+  @media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-2-1 { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .grid-4,.grid-3,.grid-2,.grid-2-1 { grid-template-columns: 1fr; } }
 
   /* ── Card ── */
   .card {
     background: var(--surface); border-radius: var(--radius);
     padding: 20px; border: 1px solid var(--border);
     box-shadow: var(--shadow);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s;
   }
   .card:hover { border-color: var(--border2); }
   .card-title {
     font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-    color: var(--text2); margin-bottom: 10px; font-weight: 600;
+    color: var(--text2); margin-bottom: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .badge {
+    font-size: 9px; padding: 2px 8px; border-radius: 10px;
+    background: var(--surface3); color: var(--text2);
   }
 
   /* ── Stat Card ── */
   .stat-card { position: relative; overflow: hidden; }
-  .stat-card::after {
-    content: ''; position: absolute; top: 0; right: 0;
-    width: 80px; height: 80px; border-radius: 50%;
-    opacity: 0.04; transform: translate(20px, -20px);
-    background: radial-gradient(circle, var(--accent), transparent);
-  }
-  .stat-card.gym-card::after { background: radial-gradient(circle, var(--purple), transparent); }
-  .stat-card.score-card::after { background: radial-gradient(circle, var(--accent3), transparent); }
-  .stat-value { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
-  .stat-value .unit { font-size: 14px; font-weight: 600; color: var(--text2); }
-  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
-  .progress-bar { height: 6px; background: var(--surface2); border-radius: 4px; margin-top: 10px; overflow: hidden; }
-  .progress-fill {
-    height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    background: linear-gradient(90deg, var(--accent), var(--cyan));
-  }
-  .progress-fill.gym { background: linear-gradient(90deg, var(--purple), var(--pink)); }
-  .progress-fill.over { background: linear-gradient(90deg, var(--accent3), var(--orange)); }
-
-  /* ── Today Status ── */
-  .today-card .today-date { font-size: 14px; color: var(--text2); margin-bottom: 2px; }
-  .today-card .today-big { font-size: 13px; color: var(--text3); }
-  .today-card .week-progress { margin-top: 12px; }
-  .today-card .week-dot-row { display: flex; gap: 6px; margin-top: 6px; }
-  .week-dot {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; color: var(--text3); transition: all 0.3s;
-  }
-  .week-dot.today { border-color: var(--accent); color: var(--accent); background: rgba(96,165,250,0.1); }
-  .week-dot.done { background: rgba(52,211,153,0.15); border-color: var(--accent2); color: var(--accent2); }
-  .week-dot.gym-done { background: rgba(167,139,250,0.15); border-color: var(--purple); color: var(--purple); }
+  .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+  .stat-value .unit { font-size: 14px; font-weight: 600; color: var(--text3); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .stat-sub { font-size: 11px; color: var(--text3); margin-top: 6px; }
+  .progress-bar { height: 5px; background: var(--surface2); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); background: linear-gradient(90deg,var(--accent),var(--cyan)); }
+  .progress-fill.gym { background: linear-gradient(90deg,var(--purple),var(--pink)); }
+  .progress-fill.over { background: linear-gradient(90deg,var(--accent3),var(--orange)); }
 
   /* ── Chart ── */
   .chart-container { height: 240px; position: relative; }
+  .chart-container.tall { height: 320px; }
 
-  /* ── AI Card ── */
-  .ai-card {
-    background: linear-gradient(135deg, rgba(96,165,250,0.06), rgba(52,211,153,0.06));
-    border: 1px solid rgba(96,165,250,0.15);
+  /* ── AI Coach ── */
+  .coach-card {
+    background: linear-gradient(135deg, rgba(79,140,247,0.06), rgba(59,206,138,0.06));
+    border: 1px solid rgba(79,140,247,0.15);
     border-radius: var(--radius);
   }
-  .ai-card:hover { border-color: rgba(96,165,250,0.3); }
-  .ai-label {
-    font-size: 11px; color: var(--accent); letter-spacing: 1px;
-    text-transform: uppercase; font-weight: 700; margin-bottom: 12px;
-    display: flex; align-items: center; gap: 6px;
+  .coach-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .coach-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
   }
-  .ai-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
-  @media (max-width: 640px) { .ai-grid { grid-template-columns: 1fr; } }
-  .ai-metric {
+  .coach-name { font-size: 15px; font-weight: 700; }
+  .coach-title { font-size: 11px; color: var(--text2); }
+  .coach-advice { font-size: 14px; line-height: 1.7; color: var(--text2); padding: 16px; background: rgba(0,0,0,0.15); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); margin-bottom: 12px; }
+  .coach-advice strong { color: var(--text); }
+  .coach-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .coach-metric {
     background: rgba(0,0,0,0.2); border-radius: var(--radius-sm);
-    padding: 12px; text-align: center; border: 1px solid rgba(96,165,250,0.08);
+    padding: 12px; text-align: center; border: 1px solid rgba(79,140,247,0.08);
   }
-  .ai-metric .num { font-size: 22px; font-weight: 800; color: var(--accent); }
-  .ai-metric .num.gym-num { color: var(--purple); }
-  .ai-metric .num.long-num { color: var(--accent3); }
-  .ai-metric .lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
-  .ai-reasoning {
-    font-size: 13px; line-height: 1.7; color: var(--text2);
-    padding: 12px; background: rgba(0,0,0,0.15);
-    border-radius: var(--radius-sm); border-left: 3px solid var(--accent);
-  }
-  .ai-reasoning strong { color: var(--text); }
-  .ai-focus {
-    display: inline-block; margin-top: 10px;
-    background: rgba(96,165,250,0.1); padding: 6px 14px;
-    border-radius: 20px; font-size: 12px; color: var(--accent);
-    border: 1px solid rgba(96,165,250,0.15);
-  }
+  .coach-metric .num { font-size: 20px; font-weight: 800; color: var(--accent); }
+  .coach-metric .num.purple { color: var(--purple); }
+  .coach-metric .num.gold { color: var(--accent3); }
+  .coach-metric .lbl { font-size: 10px; color: var(--text3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* ── Activity ── */
-  .activity-row {
+  /* ── Activity Drill ── */
+  .act-card { cursor: pointer; transition: all 0.2s; }
+  .act-card:hover { border-color: var(--accent); }
+  .act-card.selected { border-color: var(--accent); background: rgba(79,140,247,0.04); }
+  .act-row {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--border);
-    transition: background 0.15s; border-radius: var(--radius-sm);
+    padding: 14px 0; border-bottom: 1px solid var(--border);
   }
-  .activity-row:last-child { border: none; }
-  .activity-row:hover { background: rgba(255,255,255,0.02); }
-  .activity-icon {
-    width: 36px; height: 36px; border-radius: 50%;
+  .act-row:last-child { border: none; }
+  .act-icon {
+    width: 40px; height: 40px; border-radius: 50%;
     background: var(--surface2); display: flex; align-items: center;
-    justify-content: center; font-size: 16px; flex-shrink: 0;
+    justify-content: center; font-size: 18px; flex-shrink: 0;
   }
-  .activity-info { flex: 1; min-width: 0; }
-  .activity-name { font-size: 14px; font-weight: 600; }
-  .activity-meta { font-size: 12px; color: var(--text2); }
-  .activity-stats { text-align: right; font-size: 15px; font-weight: 700; font-family: var(--mono); }
-  .activity-stats .unit { font-size: 11px; font-weight: 400; color: var(--text2); }
-  .activity-stats small { font-size: 11px; color: var(--text3); font-weight: 400; display: block; }
+  .act-icon.run { background: rgba(79,140,247,0.12); }
+  .act-icon.gym { background: rgba(139,108,247,0.12); }
+  .act-info { flex: 1; min-width: 0; }
+  .act-name { font-size: 14px; font-weight: 600; }
+  .act-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .act-stats { text-align: right; font-size: 15px; font-weight: 700; font-family: var(--mono); }
+  .act-stats .unit { font-size: 10px; font-weight: 400; color: var(--text3); }
+  .act-stats small { font-size: 10px; color: var(--text3); font-weight: 400; display: block; }
 
-  /* ── Week Table ── */
-  .week-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .week-table th {
-    text-align: left; color: var(--text2); font-weight: 500;
-    font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-    padding: 8px 6px; border-bottom: 1px solid var(--border);
+  /* ── Activity Detail Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200; backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
   }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: var(--radius);
+    max-width: 600px; width: 90%; max-height: 85vh;
+    overflow-y: auto; padding: 28px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal-close {
+    float: right; background: none; border: none;
+    color: var(--text3); font-size: 22px; cursor: pointer;
+    padding: 4px 8px; border-radius: 6px;
+  }
+  .modal-close:hover { background: var(--surface2); color: var(--text); }
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .modal-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px; }
+  .modal-item .lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .modal-item .val { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .modal-item .val .s { font-size: 11px; font-weight: 400; color: var(--text3); }
+  .modal-coach { padding: 14px; background: rgba(79,140,247,0.06); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); font-size: 13px; line-height: 1.6; color: var(--text2); }
+
+  /* ── Week table ── */
+  .week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .week-table th { text-align: left; color: var(--text2); font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 6px; border-bottom: 1px solid var(--border); }
   .week-table td { padding: 10px 6px; border-bottom: 1px solid var(--border); }
   .week-table tr:last-child td { border: none; }
   .week-table td:first-child { font-weight: 600; color: var(--text2); }
-  .week-table td:nth-child(2) { font-weight: 700; font-family: var(--mono); }
-  .badge {
-    display: inline-flex; align-items: center; gap: 2px;
-    padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700;
-  }
-  .badge-yes { background: rgba(52,211,153,0.15); color: var(--accent2); }
-  .badge-no { background: rgba(248,113,113,0.12); color: var(--red); }
-  .badge-warn { background: rgba(251,191,36,0.12); color: var(--accent3); }
+  .badge { display: inline-flex; align-items: center; gap: 2px; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+  .badge-yes { background: rgba(59,206,138,0.12); color: var(--accent2); }
+  .badge-no { background: rgba(240,101,101,0.1); color: var(--red); }
+
+  /* ── Pace Zones ── */
+  .pace-zone-bar { display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+  .pace-zone-seg { display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: #fff; }
+  .zone-easy { background: var(--accent2); }
+  .zone-moderate { background: var(--accent3); }
+  .zone-hard { background: var(--orange); }
+  .zone-max { background: var(--red); }
+
+  /* ── HR Zone Bar ── */
+  .hr-zone-row { display: flex; gap: 4px; margin-top: 6px; }
+  .hr-zone-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .hr-z1 { background: #4fc3f7; }
+  .hr-z2 { background: #81c784; }
+  .hr-z3 { background: #ffb74d; }
+  .hr-z4 { background: #ef5350; }
+  .hr-z5 { background: #ce93d8; }
+
+  /* ── Race Predictor ── */
+  .predict-card { text-align: center; padding: 24px; }
+  .predict-time { font-size: 42px; font-weight: 900; font-family: var(--mono); color: var(--accent3); letter-spacing: -1px; }
+  .predict-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .predict-pace { font-size: 16px; color: var(--text); font-weight: 600; margin-top: 2px; }
+  .predict-distances { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 16px; }
+  .predict-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px; }
+  .predict-item .d { font-size: 11px; color: var(--text3); }
+  .predict-item .t { font-size: 16px; font-weight: 700; font-family: var(--mono); }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 
   /* ── Loading ── */
-  .loading { text-align: center; padding: 80px 20px; }
-  .loading .spinner {
-    width: 32px; height: 32px; border: 3px solid var(--surface2);
-    border-top-color: var(--accent); border-radius: 50%;
-    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
-  }
+  .loading { text-align: center; padding: 60px 20px; }
+  .loading .spinner { width: 32px; height: 32px; border: 3px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading p { color: var(--text2); font-size: 14px; }
 
-  /* ── Responsive tweaks ── */
-  @media (max-width: 640px) {
-    body { padding: 12px 10px 30px; }
-    .header { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .header-right { width: 100%; justify-content: flex-start; }
-    .stat-value { font-size: 24px; }
-    .ai-grid { grid-template-columns: 1fr; }
-  }
+  /* ── Trending arrows ── */
+  .trend-up { color: var(--accent2); }
+  .trend-down { color: var(--red); }
+  .trend-flat { color: var(--accent3); }
 
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .top-bar { padding: 0 12px; }
+    .tabs { padding: 0 8px; }
+    .tab-btn { padding: 12px 12px; font-size: 12px; }
+    .tab-content { padding: 14px 10px; }
+    .stat-value { font-size: 22px; }
+    .predict-time { font-size: 32px; }
+    .modal { padding: 20px; }
+    .modal-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-left">
-    <h1>🏃 Hermes <span>Training</span></h1>
-  </div>
-  <div class="header-right">
-    <span class="goal-badge">🎯 半馬 sub-<strong>1:50</strong> · <strong id="monthsLeft">5</strong> 個月</span>
-    <span class="phase-badge" id="phaseBadge">Base Phase</span>
+<div class="top-bar">
+  <h1>🏃 <span>Coach</span> Pro</h1>
+  <div class="top-right">
+    <span class="goal-chip">🎯 半馬 <strong id="goalTime">sub-1:50</strong></span>
+    <span class="phase-chip" id="phaseBadge">Base</span>
   </div>
 </div>
 
-<!-- Stat Cards -->
-<div class="grid grid-4" id="statCards">
-  <div class="card today-card stat-card">
-    <div class="card-title">📅 今日</div>
-    <div class="today-date" id="todayDate">—</div>
-    <div class="today-big" id="todayPhase">—</div>
-    <div class="week-progress">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">本週進度</div>
-      <div class="week-dot-row" id="weekDots">
-        <div class="week-dot">一</div>
-        <div class="week-dot">二</div>
-        <div class="week-dot">三</div>
-        <div class="week-dot">四</div>
-        <div class="week-dot">五</div>
-        <div class="week-dot">六</div>
-        <div class="week-dot">日</div>
+<div class="tabs" id="tabBar">
+  <button class="tab-btn active" data-tab="overview">📊 總覽</button>
+  <button class="tab-btn" data-tab="activities">🏃 活動</button>
+  <button class="tab-btn" data-tab="analytics">📈 分析</button>
+  <button class="tab-btn" data-tab="predictor">🎯 預測</button>
+  <button class="tab-btn" data-tab="coach">🤖 AI 教練</button>
+</div>
+
+<!-- ════════════ TAB 1: OVERVIEW ════════════ -->
+<div class="tab-content active" id="tab-overview">
+  <div class="grid grid-4" id="statCards">
+    <div class="card stat-card">
+      <div class="card-title">📅 今日</div>
+      <div class="stat-value" id="todayDate" style="font-size:18px;font-weight:600">—</div>
+      <div class="stat-label" id="todayPhase">—</div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-title">🏃 跑量</div>
+      <div class="stat-value"><span id="weekRun">0</span><span class="unit"> km</span></div>
+      <div class="stat-label">目標 <span id="runTarget">45</span> km</div>
+      <div class="progress-bar"><div class="progress-fill" id="runProgress" style="width:0%"></div></div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-title">💪 Gym</div>
+      <div class="stat-value"><span id="weekGym">0</span><span class="unit">x</span></div>
+      <div class="stat-label">目標 <span id="gymTarget">2</span> 次</div>
+      <div class="progress-bar"><div class="progress-fill gym" id="gymProgress" style="width:0%"></div></div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-title">📊 完成度</div>
+      <div class="stat-value"><span id="completionScore">0</span><span class="unit">%</span></div>
+      <div class="stat-label" id="completionLabel">—</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title">📈 跑量趨勢 <span class="badge">4週</span></div>
+      <div class="chart-container"><canvas id="weeklyChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 訓練負荷 <span class="badge">訓練量 × 強度</span></div>
+      <div class="chart-container"><canvas id="loadChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Quick Coach -->
+  <div class="card coach-card" style="margin-top:14px">
+    <div class="coach-header">
+      <div class="coach-avatar">🤖</div>
+      <div>
+        <div class="coach-name">AI 教練快評</div>
+        <div class="coach-title">根據上週數據自動分析</div>
+      </div>
+    </div>
+    <div id="quickCoach">載入中...</div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 2: ACTIVITIES ════════════ -->
+<div class="tab-content" id="tab-activities">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">🏃 最近活動 <span class="badge">撳入去睇詳情</span></div>
+    <div id="activityList"><p style="color:var(--text2);font-size:13px">載入中...</p></div>
+  </div>
+
+  <div class="grid grid-2-1">
+    <div class="card">
+      <div class="card-title">📋 每週詳細</div>
+      <div style="overflow-x:auto">
+        <table class="week-table">
+          <thead><tr><th>週</th><th>跑量</th><th>配速</th><th>次數</th><th>長課</th><th>Gym</th><th>負荷</th><th>達成</th></tr></thead>
+          <tbody id="weekTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 分佈</div>
+      <div class="chart-container" style="height:200px"><canvas id="typeChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 3: ANALYTICS ════════════ -->
+<div class="tab-content" id="tab-analytics">
+  <div class="grid grid-3" id="analyticsCards">
+    <div class="card stat-card">
+      <div class="card-title">❤️ 平均心率</div>
+      <div class="stat-value"><span id="avgHR">—</span><span class="unit"> bpm</span></div>
+      <div class="stat-label" id="hrZoneLabel">—</div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-title">⚡ 平均配速</div>
+      <div class="stat-value"><span id="avgPace">—</span></div>
+      <div class="stat-label" id="paceTrend">最近4週趨勢</div>
+    </div>
+    <div class="card stat-card">
+      <div class="card-title">🔥 訓練負荷</div>
+      <div class="stat-value"><span id="totalLoad">—</span><span class="unit"> pts</span></div>
+      <div class="stat-label" id="loadTrend">—</div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title">❤️ 心率區間分佈</div>
+      <div class="chart-container"><canvas id="hrZoneChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📈 配速趨勢</div>
+      <div class="chart-container"><canvas id="paceTrendChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title">🔥 訓練負荷趨勢</div>
+      <div class="chart-container tall"><canvas id="loadTrendChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 強度分佈</div>
+      <div class="chart-container"><canvas id="intensityChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card coach-card" style="margin-top:14px">
+    <div class="coach-header">
+      <div class="coach-avatar">📊</div>
+      <div>
+        <div class="coach-name">趨勢分析</div>
+        <div class="coach-title">8週數據對比</div>
+      </div>
+    </div>
+    <div id="trendAnalysis" style="font-size:13px;line-height:1.7;color:var(--text2)">載入中...</div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 4: RACE PREDICTOR ════════════ -->
+<div class="tab-content" id="tab-predictor">
+  <div class="card predict-card">
+    <div class="card-title">🎯 半馬預測</div>
+    <div class="predict-time" id="predictHalf">—</div>
+    <div class="predict-label">預測完賽時間（基於最近訓練數據）</div>
+    <div class="predict-pace" id="predictHalfPace">— /km</div>
+    <div class="predict-distances">
+      <div class="predict-item">
+        <div class="d">5K</div>
+        <div class="t" id="predict5k">—</div>
+      </div>
+      <div class="predict-item">
+        <div class="d">10K</div>
+        <div class="t" id="predict10k">—</div>
+      </div>
+      <div class="predict-item">
+        <div class="d">全馬</div>
+        <div class="t" id="predictMarathon">—</div>
       </div>
     </div>
   </div>
-  <div class="card stat-card">
-    <div class="card-title">🏃 本週跑量</div>
-    <div class="stat-value"><span id="weekRun">0</span><span class="unit"> km</span></div>
-    <div class="stat-label">目標 <span id="runTarget">45</span> km</div>
-    <div class="progress-bar"><div class="progress-fill" id="runProgress" style="width:0%"></div></div>
+
+  <div class="grid grid-2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title">📈 配速進步趨勢</div>
+      <div class="chart-container"><canvas id="progressChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 達標路徑</div>
+      <div id="pathAnalysis" style="font-size:13px;line-height:1.7;color:var(--text2)">
+        <div style="padding:16px;text-align:center;color:var(--text3)">載入中...</div>
+      </div>
+    </div>
   </div>
-  <div class="card stat-card gym-card">
-    <div class="card-title">💪 本週 Gym</div>
-    <div class="stat-value"><span id="weekGym">0</span><span class="unit">x</span></div>
-    <div class="stat-label">目標 <span id="gymTarget">2</span> 次</div>
-    <div class="progress-bar"><div class="progress-fill gym" id="gymProgress" style="width:0%"></div></div>
-  </div>
-  <div class="card stat-card score-card">
-    <div class="card-title">📊 完成度</div>
-    <div class="stat-value"><span id="completionScore">0</span><span class="unit">%</span></div>
-    <div class="stat-label" id="completionLabel">—</div>
+
+  <div class="card coach-card" style="margin-top:14px">
+    <div class="coach-header">
+      <div class="coach-avatar">🎯</div>
+      <div>
+        <div class="coach-name">AI 教練目標分析</div>
+        <div class="coach-title">sub-1:50 可行嗎？</div>
+      </div>
+    </div>
+    <div id="goalCoach" style="font-size:13px;line-height:1.7;color:var(--text2)">載入中...</div>
   </div>
 </div>
 
-<!-- Charts -->
-<div class="grid grid-2" style="margin-top:14px">
-  <div class="card">
-    <div class="card-title">📈 每週跑量趨勢</div>
-    <div class="chart-container"><canvas id="weeklyChart"></canvas></div>
+<!-- ════════════ TAB 5: AI COACH ════════════ -->
+<div class="tab-content" id="tab-coach">
+  <div class="card coach-card">
+    <div class="coach-header">
+      <div class="coach-avatar">🤖</div>
+      <div>
+        <div class="coach-name">AI 專業教練</div>
+        <div class="coach-title">全自動訓練分析 · 每日更新</div>
+      </div>
+    </div>
+
+    <div class="coach-metrics" id="coachMetrics">
+      <div class="coach-metric"><div class="num" id="cRun">—</div><div class="lbl">🏃 跑量(km)</div></div>
+      <div class="coach-metric"><div class="num purple" id="cGym">—</div><div class="lbl">💪 Gym</div></div>
+      <div class="coach-metric"><div class="num gold" id="cLong">—</div><div class="lbl">📏 長課(km)</div></div>
+    </div>
+
+    <div class="coach-advice" id="coachAdvice">
+      <strong>📝 分析：</strong>載入中...
+    </div>
+
+    <div id="coachSchedule" style="font-size:12px;color:var(--text2);padding:12px;background:rgba(0,0,0,0.1);border-radius:8px;margin-top:10px">
+      📅 載入中...
+    </div>
   </div>
-  <div class="card">
-    <div class="card-title">📊 每週完成率</div>
-    <div class="chart-container"><canvas id="completionChart"></canvas></div>
+
+  <!-- Weekly breakdown -->
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">📊 訓練日誌</div>
+    <div id="weeklyBreakdown">
+      <div style="padding:20px;text-align:center;color:var(--text3)">載入中...</div>
+    </div>
   </div>
 </div>
 
-<!-- AI 訓練建議 -->
-<div class="card ai-card" style="margin-top:14px" id="aiSuggestion">
-  <div class="ai-label">🤖 AI 訓練建議</div>
-  <div id="aiContent">載入中...</div>
-</div>
-
-<!-- 最近活動 -->
-<div class="card" style="margin-top:14px">
-  <div class="card-title">🏃 最近活動</div>
-  <div id="activityList"><p style="color:var(--text2);font-size:13px">載入中...</p></div>
-</div>
-
-<!-- 每週詳細 -->
-<div class="card" style="margin-top:14px">
-  <div class="card-title">📋 每週詳細</div>
-  <div style="overflow-x:auto">
-    <table class="week-table">
-      <thead><tr><th>週</th><th>跑量</th><th>次數</th><th>長課</th><th>Gym</th><th>達成</th></tr></thead>
-      <tbody id="weekTableBody"></tbody>
-    </table>
+<!-- ════════════ ACTIVITY MODAL ════════════ -->
+<div class="modal-overlay" id="activityModal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <h2 id="modalTitle">活動詳情</h2>
+    <div class="modal-grid" id="modalGrid"></div>
+    <div class="modal-coach" id="modalCoach">🤖 AI 分析載入中...</div>
   </div>
 </div>
 
 <script>
-// ── Inline data ──
+// ── Data ──
 const INLINE_DATA = {
   "generated_at": "2026-07-01",
   "current_phase": "base",
@@ -343,6 +557,22 @@ const INLINE_DATA = {
       "target_gym": 2,
       "run_completion_pct": 55,
       "gym_completion_pct": 0,
+      "avg_pace_sec_km": 358.4,
+      "avg_pace_str": "5:58/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 88.1,
+      "total_elevation_m": 0,
+      "total_calories": 1427.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
       "activities": [
         {
           "date": "2026-06-28",
@@ -352,8 +582,18 @@ const INLINE_DATA = {
           "duration_min": 71.6,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 606.0,
-          "pace_sec_km": 477.4
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 7.5,
+          "max_speed_kmh": 18.2,
+          "pace_sec_km": 477.4,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": null
         },
         {
           "date": "2026-06-27",
@@ -363,8 +603,18 @@ const INLINE_DATA = {
           "duration_min": 75.3,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 821.0,
-          "pace_sec_km": 289.7
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 12.4,
+          "max_speed_kmh": 20.3,
+          "pace_sec_km": 289.7,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 2.5
         }
       ]
     },
@@ -382,6 +632,22 @@ const INLINE_DATA = {
       "target_gym": 2,
       "run_completion_pct": 85,
       "gym_completion_pct": 50,
+      "avg_pace_sec_km": 365.0,
+      "avg_pace_str": "6:05/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 139.6,
+      "total_elevation_m": 43.0,
+      "total_calories": 2758.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
       "activities": [
         {
           "date": "2026-06-21",
@@ -391,8 +657,18 @@ const INLINE_DATA = {
           "duration_min": 112.2,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 903.0,
-          "pace_sec_km": 514.9
+          "elevation_gain_m": 43.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 7.0,
+          "max_speed_kmh": 9.4,
+          "pace_sec_km": 514.9,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": null
         },
         {
           "date": "2026-06-20",
@@ -402,8 +678,18 @@ const INLINE_DATA = {
           "duration_min": 107.4,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 632.0,
-          "pace_sec_km": null
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": null,
+          "max_speed_kmh": null,
+          "pace_sec_km": null,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 1.6
         },
         {
           "date": "2026-06-20",
@@ -413,8 +699,18 @@ const INLINE_DATA = {
           "duration_min": 81.6,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 862.0,
-          "pace_sec_km": 279.8
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 12.9,
+          "max_speed_kmh": 19.3,
+          "pace_sec_km": 279.8,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 0.3
         },
         {
           "date": "2026-06-19",
@@ -424,8 +720,18 @@ const INLINE_DATA = {
           "duration_min": 38.9,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 361.0,
-          "pace_sec_km": 303.9
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 11.8,
+          "max_speed_kmh": 17.6,
+          "pace_sec_km": 303.9,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": null
         }
       ]
     },
@@ -443,6 +749,22 @@ const INLINE_DATA = {
       "target_gym": 2,
       "run_completion_pct": 22,
       "gym_completion_pct": 0,
+      "avg_pace_sec_km": 377.8,
+      "avg_pace_str": "6:17/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 37.9,
+      "total_elevation_m": 51.0,
+      "total_calories": 800.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
       "activities": [
         {
           "date": "2026-06-11",
@@ -452,8 +774,18 @@ const INLINE_DATA = {
           "duration_min": 63.2,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 800.0,
-          "pace_sec_km": 377.8
+          "elevation_gain_m": 51.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 9.5,
+          "max_speed_kmh": 17.5,
+          "pace_sec_km": 377.8,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 0.3
         }
       ]
     },
@@ -471,6 +803,22 @@ const INLINE_DATA = {
       "target_gym": 2,
       "run_completion_pct": 14,
       "gym_completion_pct": 0,
+      "avg_pace_sec_km": 441.3,
+      "avg_pace_str": "7:21/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 28.6,
+      "total_elevation_m": 0,
+      "total_calories": 489.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
       "activities": [
         {
           "date": "2026-06-06",
@@ -480,8 +828,297 @@ const INLINE_DATA = {
           "duration_min": 47.7,
           "avg_hr": null,
           "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
           "calories": 489.0,
-          "pace_sec_km": 441.3
+          "elevation_gain_m": 0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 8.2,
+          "max_speed_kmh": 18.0,
+          "pace_sec_km": 441.3,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 2.1
+        }
+      ]
+    },
+    {
+      "week_start": "2026-05-25",
+      "week_end": "2026-05-31",
+      "total_run_km": 8.2,
+      "outdoor_km": 8.2,
+      "treadmill_km": 0,
+      "gym_sessions": 0,
+      "total_duration_min": 55.7,
+      "run_sessions": 1,
+      "longest_run_km": 8.2,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 18,
+      "gym_completion_pct": 0,
+      "avg_pace_sec_km": 409.2,
+      "avg_pace_str": "6:49/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 33.4,
+      "total_elevation_m": 62.0,
+      "total_calories": 688.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
+      "activities": [
+        {
+          "date": "2026-05-30",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 8.16,
+          "duration_min": 55.7,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 688.0,
+          "elevation_gain_m": 62.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 8.8,
+          "max_speed_kmh": 15.7,
+          "pace_sec_km": 409.2,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 1.3
+        }
+      ]
+    },
+    {
+      "week_start": "2026-05-18",
+      "week_end": "2026-05-24",
+      "total_run_km": 16.5,
+      "outdoor_km": 16.5,
+      "treadmill_km": 0,
+      "gym_sessions": 0,
+      "total_duration_min": 106.2,
+      "run_sessions": 2,
+      "longest_run_km": 9.3,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 37,
+      "gym_completion_pct": 0,
+      "avg_pace_sec_km": 385.3,
+      "avg_pace_str": "6:25/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 63.7,
+      "total_elevation_m": 16.0,
+      "total_calories": 1377.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
+      "activities": [
+        {
+          "date": "2026-05-23",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 9.27,
+          "duration_min": 60.9,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 786.0,
+          "elevation_gain_m": 14.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 9.1,
+          "max_speed_kmh": 15.2,
+          "pace_sec_km": 394.3,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 1.9
+        },
+        {
+          "date": "2026-05-21",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 7.26,
+          "duration_min": 45.3,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 591.0,
+          "elevation_gain_m": 2.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 9.6,
+          "max_speed_kmh": 16.0,
+          "pace_sec_km": 373.8,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 2.1
+        }
+      ]
+    },
+    {
+      "week_start": "2026-05-11",
+      "week_end": "2026-05-17",
+      "total_run_km": 14.8,
+      "outdoor_km": 14.8,
+      "treadmill_km": 0,
+      "gym_sessions": 0,
+      "total_duration_min": 117.5,
+      "run_sessions": 2,
+      "longest_run_km": 7.4,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 33,
+      "gym_completion_pct": 0,
+      "avg_pace_sec_km": 478.0,
+      "avg_pace_str": "7:58/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 70.5,
+      "total_elevation_m": 72.0,
+      "total_calories": 1233.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
+      "activities": [
+        {
+          "date": "2026-05-17",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 7.37,
+          "duration_min": 67.1,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 500.0,
+          "elevation_gain_m": 67.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 6.6,
+          "max_speed_kmh": 16.5,
+          "pace_sec_km": 546.1,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": null
+        },
+        {
+          "date": "2026-05-12",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 7.38,
+          "duration_min": 50.4,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 733.0,
+          "elevation_gain_m": 5.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 8.8,
+          "max_speed_kmh": 18.1,
+          "pace_sec_km": 410.0,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 2.5
+        }
+      ]
+    },
+    {
+      "week_start": "2026-05-04",
+      "week_end": "2026-05-10",
+      "total_run_km": 7.4,
+      "outdoor_km": 7.4,
+      "treadmill_km": 0,
+      "gym_sessions": 0,
+      "total_duration_min": 46.9,
+      "run_sessions": 2,
+      "longest_run_km": 4.8,
+      "target_run_km": 45,
+      "target_gym": 2,
+      "run_completion_pct": 16,
+      "gym_completion_pct": 0,
+      "avg_pace_sec_km": 379.9,
+      "avg_pace_str": "6:19/km",
+      "avg_hr": null,
+      "avg_intensity_pct": null,
+      "training_load": 28.1,
+      "total_elevation_m": 8.0,
+      "total_calories": 650.0,
+      "hr_zone_distribution": {
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "easy_run_pct": 0,
+      "recovery_score": 0,
+      "activities": [
+        {
+          "date": "2026-05-09",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 2.56,
+          "duration_min": 17.2,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 252.0,
+          "elevation_gain_m": 2.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 9.0,
+          "max_speed_kmh": 17.5,
+          "pace_sec_km": 401.5,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": 2.9
+        },
+        {
+          "date": "2026-05-09",
+          "type": "running",
+          "name": "九龍 跑步",
+          "distance_km": 4.83,
+          "duration_min": 29.7,
+          "avg_hr": null,
+          "max_hr": null,
+          "hr_zone_avg": null,
+          "hr_zone_avg_name": null,
+          "calories": 398.0,
+          "elevation_gain_m": 6.0,
+          "avg_cadence": null,
+          "max_cadence": null,
+          "avg_speed_kmh": 9.8,
+          "max_speed_kmh": 12.7,
+          "pace_sec_km": 368.4,
+          "intensity_pct": null,
+          "training_effect": null,
+          "anaerobic_effect": null
         }
       ]
     }
@@ -512,69 +1149,52 @@ const INLINE_PLAN = {
   "notes": "6月頭跑量好低（6.5km/10km），但月中明顯進步（38.2km/24.6km）。上週回落係因為跑咗2次而唔係3次，長課15.6km其實有進步（之前最長17.5km）。Base階段目標係每週穩定30-40km、保持2-3次跑步+2次gym。仲有5個月到Dec半馬，時間好充足，最緊要係 consistent 唔好受傷。Sub-1:50半馬（5:13/km配速）以你VO2max 50同而家10k pace (~6:17/km)泥講完全可行，base phase 做好 aerobic base 之後再加 speed work 就得。"
 };
 
-// ── Helper ──
-function fmtPace(s) { const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; }
+// ── Helpers ──
+function fmtPace(s) { if(!s)return'—'; const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; }
+function secToTime(s) { if(!s)return'—'; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?h+'h '+m+'m':m+'m '+Math.round(s%60)+'s'; }
+const ICONS = { running:'🏃', treadmill_running:'🏃', strength_training:'💪', cycling:'🚴', walking:'🚶', swimming:'🏊' };
+const TNAMES = { running:'戶外跑', treadmill_running:'跑步機', strength_training:'肌力訓練', cycling:'踩單車', walking:'散步', swimming:'游水' };
 
-// ── Render ──
+// ── Tab switching ──
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Modal ──
+const modal = document.getElementById('activityModal');
+document.getElementById('modalClose').addEventListener('click',()=>modal.classList.remove('open'));
+modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
+
+// ── Main Render ──
 function render() {
   const d = INLINE_DATA, p = INLINE_PLAN;
   const w = d.this_week, ws = d.weekly_stats;
 
-  // Phase badge
+  // Phase
   const pn = { base:'Base · 累積里數', build:'Build · 速度訓練', peak:'Peak · 比賽配速', taper:'Taper · 減量休息' };
-  document.getElementById('phaseBadge').textContent = pn[d.current_phase] || d.current_phase;
-  document.getElementById('monthsLeft').textContent = d.goal.months_remaining;
+  document.getElementById('phaseBadge').textContent = pn[d.current_phase]||d.current_phase;
 
-  // Today
-  document.getElementById('todayDate').textContent = w.today;
-  const wd = ['日','一','二','三','四','五','六'];
+  // ── TAB 1: Overview ──
   const dt = new Date(w.today);
-  document.getElementById('todayPhase').textContent = '週'+wd[dt.getDay()]+' · Week '+Math.ceil((dt-new Date('2026-06-01'))/(7*86400000));
-
-  // Week dots (Mon=0..Sun=6)
-  const dots = document.querySelectorAll('.week-dot');
-  const dotToday = dt.getDay()===0?6:dt.getDay()-1; // 0=Mon
-  const dotNames = ['一','二','三','四','五','六','日'];
-  // Determine which days have activities this week
-  const thisWeekActs = ws.length>0 ? ws[0].activities : [];
-  const actDays = new Set();
-  for (const a of thisWeekActs) {
-    const ad = new Date(a.date);
-    const dIdx = ad.getDay()===0?6:ad.getDay()-1;
-    actDays.add(dIdx);
-  }
-  // Track gym days separately
-  const gymDays = new Set();
-  for (const a of thisWeekActs) {
-    if (a.type==='strength_training') {
-      const ad = new Date(a.date);
-      gymDays.add(ad.getDay()===0?6:ad.getDay()-1);
-    }
-  }
-  dots.forEach((dot,i)=>{
-    dot.textContent = dotNames[i];
-    dot.className = 'week-dot';
-    if (i===dotToday) dot.classList.add('today');
-    if (actDays.has(i) && i!==dotToday) dot.classList.add('done');
-    if (gymDays.has(i)) dot.classList.add('gym-done');
-  });
-
-  // Stats
+  const wd = ['日','一','二','三','四','五','六'];
+  document.getElementById('todayDate').textContent = w.today + ' 週'+wd[dt.getDay()];
+  document.getElementById('todayPhase').textContent = 'Week '+Math.ceil((dt-new Date('2026-06-01'))/(7*86400000));
   document.getElementById('weekRun').textContent = w.current_run_km;
   document.getElementById('runTarget').textContent = w.target_run_km;
   document.getElementById('runProgress').style.width = w.run_progress_pct+'%';
-  if (w.run_progress_pct>=100) document.getElementById('runProgress').classList.add('over');
-
   document.getElementById('weekGym').textContent = w.current_gym;
   document.getElementById('gymTarget').textContent = w.target_gym;
   document.getElementById('gymProgress').style.width = w.gym_progress_pct+'%';
+  const sc = Math.round((w.run_progress_pct+w.gym_progress_pct)/2);
+  document.getElementById('completionScore').textContent = sc;
+  document.getElementById('completionLabel').textContent = sc>80?'🔥 超標':sc>60?'👍 良好':sc>30?'💪 努力':'❄️ 加油';
 
-  const score = Math.round((w.run_progress_pct+w.gym_progress_pct)/2);
-  document.getElementById('completionScore').textContent = score;
-  const sl = score>80?'🔥 超標！':score>60?'👍 做得好':score>30?'💪 努力中':'❄️ 加油呀';
-  document.getElementById('completionLabel').textContent = sl;
-
-  // ── Weekly mileage chart ──
+  // Weekly mileage chart
   const rev = [...ws].reverse();
   const lbls = rev.map(s=>s.week_start.slice(5));
   new Chart(document.getElementById('weeklyChart'),{
@@ -582,86 +1202,307 @@ function render() {
     data:{
       labels:lbls,
       datasets:[
-        { label:'跑步機', data:rev.map(s=>s.treadmill_km), backgroundColor:'rgba(96,165,250,0.6)', borderRadius:4, barPercentage:0.6 },
-        { label:'戶外', data:rev.map(s=>s.outdoor_km), backgroundColor:'rgba(52,211,153,0.6)', borderRadius:4, barPercentage:0.6 },
-        { label:'目標', data:rev.map(s=>s.target_run_km), type:'line', borderColor:'rgba(251,191,36,0.5)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false }
+        { label:'跑步機', data:rev.map(s=>s.treadmill_km), backgroundColor:'rgba(79,140,247,0.6)', borderRadius:4, barPercentage:0.6 },
+        { label:'戶外', data:rev.map(s=>s.outdoor_km), backgroundColor:'rgba(59,206,138,0.6)', borderRadius:4, barPercentage:0.6 },
+        { label:'目標', data:rev.map(s=>s.target_run_km), type:'line', borderColor:'rgba(245,182,66,0.5)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false }
       ]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ color:'#8b8fa3', font:{size:11} } } },
-      scales:{
-        x:{ stacked:true, ticks:{ color:'#8b8fa3', font:{size:11} }, grid:{ color:'rgba(42,46,66,0.3)' } },
-        y:{ stacked:true, beginAtZero:true, ticks:{ color:'#8b8fa3', font:{size:11} }, grid:{ color:'rgba(42,46,66,0.3)' } }
-      }
-    }
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ stacked:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ stacked:true, beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
   });
 
-  // ── Completion radar ──
-  const pv = ws.length>1 ? ws[1] : null;
-  const lw = pv ? [pv.run_completion_pct, pv.gym_completion_pct, Math.round(pv.longest_run_km/20*100)] : [0,0,0];
-  const tw = [w.run_progress_pct, w.gym_progress_pct, Math.round(w.current_longest_run_km/20*100)];
-  new Chart(document.getElementById('completionChart'),{
-    type:'radar',
+  // Training load chart
+  new Chart(document.getElementById('loadChart'),{
+    type:'line',
     data:{
-      labels:['🏃 跑量','💪 Gym','📏 長課'],
-      datasets:[
-        { label:'上週', data:lw, borderColor:'rgba(167,139,250,0.6)', backgroundColor:'rgba(167,139,250,0.08)', pointBackgroundColor:'#a78bfa', pointBorderColor:'transparent', borderWidth:2 },
-        { label:'本週', data:tw, borderColor:'rgba(96,165,250,0.6)', backgroundColor:'rgba(96,165,250,0.08)', pointBackgroundColor:'#60a5fa', pointBorderColor:'transparent', borderWidth:2 }
-      ]
+      labels:lbls,
+      datasets:[{
+        label:'訓練負荷', data:rev.map(s=>s.training_load||s.total_run_km*0.6),
+        borderColor:'rgba(139,108,247,0.8)', backgroundColor:'rgba(139,108,247,0.1)',
+        fill:true, tension:0.3, pointBackgroundColor:'#8b6cf7', pointRadius:4,
+        borderWidth:2
+      }]
     },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ labels:{ color:'#8b8fa3', font:{size:11} } } },
-      scales:{ r:{ ticks:{ color:'#8b8fa3', backdropColor:'transparent', font:{size:10}, stepSize:25 }, grid:{ color:'rgba(42,46,66,0.4)' }, angleLines:{ color:'rgba(42,46,66,0.4)' }, pointLabels:{ color:'#edf0f7', font:{size:12,weight:'600'} }, suggestedMax:100, beginAtZero:true } }
-    }
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
   });
 
-  // ── AI suggestion ──
-  const aiEl = document.getElementById('aiContent');
-  if (p && p.next_week_plan) {
-    const n = p.next_week_plan;
-    aiEl.innerHTML = `
-      <div class="ai-grid">
-        <div class="ai-metric"><div class="num">${n.run_km}<span style="font-size:13px;color:var(--text2)">km</span></div><div class="lbl">🏃 下週跑量</div></div>
-        <div class="ai-metric"><div class="num gym-num">${n.gym_sessions}<span style="font-size:13px;color:var(--text2)">x</span></div><div class="lbl">💪 Gym 次數</div></div>
-        <div class="ai-metric"><div class="num long-num">${n.long_run}<span style="font-size:13px;color:var(--text2)">km</span></div><div class="lbl">📏 長課距離</div></div>
-      </div>
-      <div class="ai-reasoning">
-        <strong>📝 AI 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}
-      </div>
-      <div class="ai-focus">🎯 ${n.focus || '繼續累積里數'}</div>
-      ${n.weekly_schedule ? '<div style="margin-top:10px;font-size:12px;color:var(--text2);padding:8px 12px;background:rgba(0,0,0,0.1);border-radius:6px">📅 '+n.weekly_schedule+'</div>' : ''}
-    `;
+  // Quick coach
+  const prev = ws.length>0 ? ws[0] : null;
+  let qc = '';
+  if (prev) {
+    const pct = prev.run_completion_pct;
+    const gymOk = prev.gym_sessions>=2;
+    if (pct>=85 && gymOk) qc = '🔥 上週表現好好！跑量同 gym 都達標，可以考慮加量。';
+    else if (pct>=60) qc = `👍 上週跑到 ${prev.total_run_km}km（${pct}%），但 gym 仲要努力。`;
+    else if (pct>0) qc = `💪 上週跑到 ${prev.total_run_km}km，離目標仲有距離，今週加油！`;
+    else qc = '❄️ 上週未有數據，快啲去跑啦！';
+    if (!gymOk) qc += ' Gym方面要補返，每週至少2次。';
   }
+  document.getElementById('quickCoach').innerHTML = `<div class="coach-advice"><strong>📝 上週回顧：</strong>${qc}</div>`;
 
-  // ── Activities ──
-  const all = ws.flatMap(s=>s.activities).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
-  const icons = { running:'🏃', treadmill_running:'🏃', strength_training:'💪', cycling:'🚴', walking:'🚶', swimming:'🏊' };
-  const typeNames = { running:'戶外跑', treadmill_running:'跑步機', strength_training:'肌力訓練', cycling:'踩單車', walking:'散步', swimming:'游水' };
-  document.getElementById('activityList').innerHTML = all.map(a=>{
-    const icon = icons[a.type]||'🏃';
-    const tn = typeNames[a.type]||a.type;
+  // ── TAB 2: Activities ──
+  const all = ws.flatMap(s=>s.activities).sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('activityList').innerHTML = all.map((a,i)=>{
+    const icon = ICONS[a.type]||'🏃', tn = TNAMES[a.type]||a.type;
     const pace = a.pace_sec_km ? fmtPace(a.pace_sec_km) : '';
-    return `<div class="activity-row">
-      <div class="activity-icon">${icon}</div>
-      <div class="activity-info">
-        <div class="activity-name">${a.name||tn}</div>
-        <div class="activity-meta">${a.date} ${pace?'· '+pace:''}</div>
+    const cls = a.type==='strength_training'?'gym':'run';
+    return `<div class="act-row act-card ${cls}" onclick="showActivity(${i})">
+      <div class="act-icon ${cls}">${icon}</div>
+      <div class="act-info">
+        <div class="act-name">${a.name||tn}</div>
+        <div class="act-meta">${a.date} ${pace?'· '+pace:''}</div>
       </div>
       ${a.distance_km>0
-        ? `<div class="activity-stats">${a.distance_km}<span class="unit">km</span><small>${a.duration_min}min</small></div>`
-        : `<div class="activity-stats">—<small>${a.duration_min}min</small></div>`}
+        ? `<div class="act-stats">${a.distance_km}<span class="unit">km</span><small>${a.duration_min}min</small></div>`
+        : `<div class="act-stats">—<small>${a.duration_min}min</small></div>`}
     </div>`;
   }).join('');
 
-  // ── Week table ──
+  // Week table
   document.getElementById('weekTableBody').innerHTML = ws.map(s=>{
-    const rOk = s.run_completion_pct>=85;
-    const gOk = s.gym_sessions>=2;
+    const rOk = s.run_completion_pct>=85, gOk = s.gym_sessions>=2;
     const b = (rOk?'<span class="badge badge-yes">🏃✓</span>':'<span class="badge badge-no">🏃✗</span>')+' '+(gOk?'<span class="badge badge-yes">💪✓</span>':'<span class="badge badge-no">💪✗</span>');
-    return `<tr><td>${s.week_start.slice(5)}</td><td>${s.total_run_km}<span style="font-weight:400;color:var(--text3);font-size:11px"> km</span></td><td>${s.run_sessions}x</td><td>${s.longest_run_km}<span style="font-weight:400;color:var(--text3);font-size:11px"> km</span></td><td>${s.gym_sessions}x</td><td>${b}</td></tr>`;
+    return `<tr><td>${s.week_start.slice(5)}</td><td>${s.total_run_km}<span style="font-weight:400;color:var(--text3);font-size:10px">km</span></td><td style="font-family:var(--mono);font-size:11px">${s.avg_pace_str||'—'}</td><td>${s.run_sessions}x</td><td>${s.longest_run_km}<span style="font-weight:400;color:var(--text3);font-size:10px">km</span></td><td>${s.gym_sessions}x</td><td style="font-family:var(--mono);font-size:11px">${s.training_load||s.total_run_km*0.6|0}</td><td>${b}</td></tr>`;
   }).join('');
+
+  // Type distribution
+  const typeCounts = {};
+  all.forEach(a=>{ const t=TNAMES[a.type]||a.type; typeCounts[t]=(typeCounts[t]||0)+1; });
+  new Chart(document.getElementById('typeChart'),{
+    type:'doughnut',
+    data:{ labels:Object.keys(typeCounts), datasets:[{ data:Object.values(typeCounts), backgroundColor:['rgba(79,140,247,0.7)','rgba(59,206,138,0.7)','rgba(139,108,247,0.7)','rgba(245,182,66,0.7)'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ color:'#7e8299', font:{size:10}, padding:8 } } } }
+  });
+
+  // ── TAB 3: Analytics ──
+  // Calc averages
+  const runActs = all.filter(a=>'run' in a.type);
+  const paces = runActs.filter(a=>a.pace_sec_km).map(a=>a.pace_sec_km);
+  const avgPace = paces.length>0 ? paces.reduce((a,b)=>a+b,0)/paces.length : null;
+  document.getElementById('avgPace').textContent = avgPace ? fmtPace(avgPace) : '—';
+  // Pace trend
+  if (ws.length>=2) {
+    const oldPace = ws[ws.length-1].avg_pace_sec_km;
+    const newPace = ws[0].avg_pace_sec_km;
+    if (oldPace && newPace) {
+      const diff = oldPace - newPace;
+      document.getElementById('paceTrend').textContent = diff>0 ? `⚡ 快咗 ${fmtPace(diff)}` : diff<0 ? `🐢 慢咗 ${fmtPace(-diff)}` : '不變';
+      document.getElementById('paceTrend').className = diff>0?'trend-up':'trend-down';
+    }
+  }
+
+  // Total load
+  const totalLoad = ws.reduce((s,w)=>s+(w.training_load||w.total_run_km*0.6),0);
+  document.getElementById('totalLoad').textContent = Math.round(totalLoad);
+  document.getElementById('loadTrend').textContent = `8週累計 ${Math.round(totalLoad/8)} pts/週`;
+
+  // HR zone chart
+  new Chart(document.getElementById('hrZoneChart'),{
+    type:'radar',
+    data:{ labels:['Z1 恢復','Z2 有氧','Z3 節奏','Z4 閾值','Z5 最大'], datasets:[{ label:'本週', data:[0,0,0,0,0], borderColor:'rgba(79,140,247,0.6)', backgroundColor:'rgba(79,140,247,0.08)', pointBackgroundColor:'#4f8cf7', borderWidth:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ r:{ ticks:{ color:'#7e8299', backdropColor:'transparent', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.4)' }, angleLines:{ color:'rgba(37,41,64,0.4)' }, pointLabels:{ color:'#e8ebf2', font:{size:11} }, suggestedMax:5, beginAtZero:true } } }
+  });
+
+  // Pace trend chart
+  new Chart(document.getElementById('paceTrendChart'),{
+    type:'line',
+    data:{
+      labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
+      datasets:[{
+        label:'平均配速 (sec/km)', data:[...ws].reverse().map(s=>s.avg_pace_sec_km),
+        borderColor:'rgba(79,140,247,0.8)', backgroundColor:'rgba(79,140,247,0.1)',
+        fill:true, tension:0.3, pointBackgroundColor:'#4f8cf7', pointRadius:4,
+        borderWidth:2
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>fmtPace(v) }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+  });
+
+  // Load trend chart
+  new Chart(document.getElementById('loadTrendChart'),{
+    type:'bar',
+    data:{
+      labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
+      datasets:[{
+        label:'訓練負荷', data:[...ws].reverse().map(s=>s.training_load||s.total_run_km*0.6),
+        backgroundColor:'rgba(139,108,247,0.6)', borderRadius:4, barPercentage:0.5
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+  });
+
+  // Intensity chart
+  new Chart(document.getElementById('intensityChart'),{
+    type:'bar',
+    data:{
+      labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
+      datasets:[{
+        label:'強度 %', data:[...ws].reverse().map(s=>s.avg_intensity_pct||50),
+        backgroundColor:'rgba(245,182,66,0.6)', borderRadius:4, barPercentage:0.5
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, max:100, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+  });
+
+  // Trend analysis text
+  const first = ws[ws.length-1], last = ws[0];
+  let trend = '';
+  if (first && last) {
+    const volDiff = last.total_run_km - first.total_run_km;
+    trend = `<strong>📈 跑量趨勢：</strong>${volDiff>0?'上升':'下降'}（${first.total_run_km}km → ${last.total_run_km}km）<br>
+    <strong>⚡ 配速：</strong>${last.avg_pace_str||'數據不足'} · ${first.avg_pace_str||'數據不足'}<br>
+    <strong>💪 Gym：</strong>${ws.map(s=>s.gym_sessions).join('→')} 次/週<br>
+    <strong>🔥 訓練負荷趨勢：</strong>${ws.map(s=>s.training_load||s.total_run_km*0.6|0).join('→')}<br>
+    <strong>📊 建議：</strong>${volDiff>0?'跑量正在增加，繼續保持！':'需要穩定增加跑量，目標每週遞增10%'}`;
+  }
+  document.getElementById('trendAnalysis').innerHTML = trend;
+
+  // ── TAB 4: Race Predictor ──
+  // VDOT-style: based on best recent performance
+  const bestPace = paces.length>0 ? Math.min(...paces) : 280; // ~4:40/km
+  const halfPace = bestPace * 1.08; // 8% slower for HM
+  const halfSec = halfPace * 21.1;
+  const halfStr = secToTime(halfSec);
+  document.getElementById('predictHalf').textContent = halfStr;
+  document.getElementById('predictHalfPace').textContent = fmtPace(halfPace);
+  document.getElementById('predict5k').textContent = secToTime(bestPace * 5 * 1.04);
+  document.getElementById('predict10k').textContent = secToTime(bestPace * 10 * 1.06);
+  document.getElementById('predictMarathon').textContent = secToTime(halfPace * 2 * 1.05);
+
+  // Progress chart
+  new Chart(document.getElementById('progressChart'),{
+    type:'line',
+    data:{
+      labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
+      datasets:[{
+        label:'配速 (sec/km)', data:[...ws].reverse().map(s=>s.avg_pace_sec_km),
+        borderColor:'rgba(245,182,66,0.8)', backgroundColor:'rgba(245,182,66,0.1)',
+        fill:true, tension:0.3, pointBackgroundColor:'#f5b642', pointRadius:5,
+        borderWidth:2
+      },{
+        label:'目標半馬配速 (5:13)', data:[...ws].reverse().map(()=>313),
+        borderColor:'rgba(240,101,101,0.5)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false
+      }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>fmtPace(v) }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+  });
+
+  // Goal path
+  const goalPace = 313; // 5:13/km for sub-1:50
+  const currentPace = avgPace || 380; // ~6:20
+  const gapSec = currentPace - goalPace;
+  const gapPct = Math.round((1 - goalPace/currentPace)*100);
+  document.getElementById('pathAnalysis').innerHTML = `
+    <div style="padding:16px">
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3)">
+          <span>而家配速</span><span>目標配速</span>
+        </div>
+        <div class="pace-zone-bar" style="margin:4px 0 8px">
+          <div class="pace-zone-seg zone-easy" style="width:${100-gapPct}%">${fmtPace(goalPace)}</div>
+          <div class="pace-zone-seg zone-hard" style="width:${gapPct}%">${fmtPace(currentPace)}</div>
+        </div>
+        <div style="text-align:center;font-size:13px;color:var(--text2)">
+          需要進步 <strong style="color:var(--accent3)">${gapPct}%</strong> 配速
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;line-height:1.6;color:var(--text2)">
+        <strong>📅 時間表：</strong>5個月到 Dec 2026<br>
+        <strong>📊 每月目標：</strong>每月配速進步 ~${Math.round(gapPct/5)}%<br>
+        <strong>🏃 關鍵訓練：</strong>Base phase 打好 aerobic base → Build phase 加 tempo/intervals → Peak phase race pace work
+      </div>
+    </div>
+  `;
+
+  // Goal coach
+  document.getElementById('goalCoach').innerHTML = `
+    <div class="coach-advice">
+      <strong>📊 可行性分析：</strong><br>
+      VO2max 50 · 年齡 33 · 而家 10K pace ~6:17/km<br><br>
+      <strong>Sub-1:50（5:13/km）</strong> — 以你而家 fitness level 係 <strong style="color:var(--accent2)">完全可行 ✅</strong><br>
+      由 6:17/km 到 5:13/km 需要約 <strong>17%</strong> 配速進步<br>
+      5個月時間，每月只需進步 ~3.4%<br><br>
+      <strong>訓練路徑：</strong><br>
+      • 6-7月（Base）：每週30-45km，全部 easy pace，建立 aerobic base<br>
+      • 8-9月（Build）：加 tempo run (5:30-5:45/km) + 間歇跑<br>
+      • 10-11月（Peak）：race pace work + 長課 18-20km<br>
+      • 12月：Taper + 半馬比賽<br><br>
+      <strong>關鍵成功因素：</strong><br>
+      ✓ Consistent mileage（唔好跳跑）<br>
+      ✓ Gym 2x/週（防止受傷）<br>
+      ✓ 長課每週 progressive（最後5km加速）<br>
+      ✓ 充足睡眠同營養
+    </div>
+  `;
+
+  // ── TAB 5: AI Coach ──
+  if (p && p.next_week_plan) {
+    const n = p.next_week_plan;
+    document.getElementById('cRun').textContent = n.run_km;
+    document.getElementById('cGym').textContent = n.gym_sessions;
+    document.getElementById('cLong').textContent = n.long_run;
+    document.getElementById('coachAdvice').innerHTML = `
+      <strong>📝 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}
+    `;
+    document.getElementById('coachSchedule').innerHTML = `📅 ${n.weekly_schedule || '未有行程'}`;
+  }
+
+  // Weekly breakdown
+  document.getElementById('weeklyBreakdown').innerHTML = ws.map(s=>{
+    const pct = s.run_completion_pct;
+    const color = pct>=85?'var(--accent2)':pct>=60?'var(--accent3)':'var(--red)';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;width:50px">${s.week_start.slice(5)}</div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:2px">
+          <span>🏃 ${s.total_run_km}km / ${s.run_sessions}x</span>
+          <span>💪 ${s.gym_sessions}x</span>
+          <span>📏 ${s.longest_run_km}km</span>
+        </div>
+        <div class="progress-bar" style="height:4px">
+          <div class="progress-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:${color};min-width:40px;text-align:right">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Activity Detail Modal ──
+function showActivity(idx) {
+  const d = INLINE_DATA;
+  const all = d.weekly_stats.flatMap(s=>s.activities).sort((a,b)=>b.date.localeCompare(a.date));
+  const a = all[idx];
+  if (!a) return;
+  
+  document.getElementById('modalTitle').textContent = `${ICONS[a.type]||'🏃'} ${a.name||TNAMES[a.type]||'活動'}`;
+  
+  const items = [
+    { lbl:'日期', val:a.date },
+    { lbl:'類型', val:TNAMES[a.type]||a.type },
+    { lbl:'距離', val:a.distance_km>0?a.distance_km+'<span class="s"> km</span>':'—' },
+    { lbl:'時間', val:a.duration_min+'<span class="s"> min</span>' },
+    { lbl:'配速', val:a.pace_sec_km?fmtPace(a.pace_sec_km):'—' },
+    { lbl:'心率', val:a.avg_hr?a.avg_hr+'<span class="s"> bpm</span>':'—' },
+    { lbl:'卡路里', val:a.calories?a.calories+'<span class="s"> kcal</span>':'—' },
+    { lbl:'心率區間', val:a.hr_zone_avg_name||'—' },
+  ];
+  document.getElementById('modalGrid').innerHTML = items.map(i=>`<div class="modal-item"><div class="lbl">${i.lbl}</div><div class="val">${i.val}</div></div>`).join('');
+  
+  // AI Coach analysis for this activity
+  let coachMsg = '';
+  if (a.type==='strength_training') {
+    coachMsg = '💪 Gym session — 肌力訓練對跑步好重要，尤其係核心同腳部力量。每週至少2次，可以預防受傷。';
+  } else if (a.pace_sec_km) {
+    const paceMin = a.pace_sec_km/60;
+    if (paceMin < 5) coachMsg = `⚡ 快跑！${fmtPace(a.pace_sec_km)} 配速接近閾值區，呢個係高強度訓練。注意 recovery。`;
+    else if (paceMin < 6) coachMsg = `🏃 Tempo 區配速（${fmtPace(a.pace_sec_km)}），好好嘅節奏跑，有助提升乳酸閾值。`;
+    else if (paceMin < 7.5) coachMsg = `🌱 Easy run（${fmtPace(a.pace_sec_km)}），正確嘅有氧配速。Base phase 最緊要係 keep 住呢個 zone。`;
+    else coachMsg = `🐢 Recovery pace（${fmtPace(a.pace_sec_km)}），適合 recovery day 或者熱身。`;
+  }
+  if (a.calories > 800) coachMsg += ' 🔥 高卡路里消耗，證明訓練量充足。';
+  document.getElementById('modalCoach').innerHTML = '🤖 ' + (coachMsg || '繼續保持！每個訓練都係進步嘅一部分。');
+  
+  modal.classList.add('open');
 }
 
 document.addEventListener('DOMContentLoaded', render);
