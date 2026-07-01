@@ -2079,12 +2079,13 @@ function render() {
       ? sortedPaces.slice(0,3).reduce((a,b)=>a+b,0)/3 
       : (sortedPaces[0] || 280);
   
-    // HM prediction: more conservative = avg_pace * 1.0 (you can't race HM at 5K pace!)
-    // Use weighted: 60% recent avg + 40% best pace, then add HM adjustment
-    const effectivePace = avgPaceSec * 0.6 + bestPace * 0.4;
-    // HM pace is typically ~5-10% slower than 10K pace
-    // If you can run 5K at 5:00, HM at 5:13 is reasonable
-    const halfPace = Math.max(effectivePace * 1.05, 313); // floor at 5:13
+    // HM prediction: weighted avg of best pace (40%) and avg pace (60%)
+        // But floor by the best pace since you can't predict HM slower than your easy runs
+        const effectivePace = avgPaceSec * 0.5 + bestPace * 0.5;
+        // HM pace is typically ~5-10% slower than 5K pace
+        // Realistic: bestPace ~5:49 → HM ~6:05-6:15 for a well-trained runner
+        // With your current base (80%+ hard runs), conservation is warranted
+        const halfPace = Math.max(effectivePace * 1.05, 350); // floor at 5:50
   
     const halfSec = halfPace * 21.1;
     const halfStr = secToTime(halfSec);
