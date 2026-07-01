@@ -546,19 +546,19 @@ const INLINE_DATA = {
     {
       "week_start": "2026-06-22",
       "week_end": "2026-06-28",
-      "total_run_km": 24.6,
+      "total_run_km": 19.6,
       "outdoor_km": 0,
-      "treadmill_km": 24.6,
+      "treadmill_km": 19.6,
       "gym_sessions": 0,
       "total_duration_min": 146.9,
       "run_sessions": 2,
-      "longest_run_km": 15.6,
+      "longest_run_km": 10.6,
       "target_run_km": 45,
       "target_gym": 2,
-      "run_completion_pct": 55,
+      "run_completion_pct": 44,
       "gym_completion_pct": 0,
-      "avg_pace_sec_km": 358.4,
-      "avg_pace_str": "5:58/km",
+      "avg_pace_sec_km": 449.8,
+      "avg_pace_str": "7:29/km",
       "avg_hr": null,
       "avg_intensity_pct": null,
       "training_load": 88.1,
@@ -599,7 +599,7 @@ const INLINE_DATA = {
           "date": "2026-06-27",
           "type": "treadmill_running",
           "name": "跑步機",
-          "distance_km": 15.59,
+          "distance_km": 10.59,
           "duration_min": 75.3,
           "avg_hr": null,
           "max_hr": null,
@@ -609,9 +609,9 @@ const INLINE_DATA = {
           "elevation_gain_m": 0,
           "avg_cadence": null,
           "max_cadence": null,
-          "avg_speed_kmh": 12.4,
+          "avg_speed_kmh": 8.4,
           "max_speed_kmh": 20.3,
-          "pace_sec_km": 289.7,
+          "pace_sec_km": 426.3,
           "intensity_pct": null,
           "training_effect": null,
           "anaerobic_effect": 2.5
@@ -1357,8 +1357,13 @@ function render() {
   document.getElementById('trendAnalysis').innerHTML = trend;
 
   // ── TAB 4: Race Predictor ──
-  // VDOT-style: based on best recent performance
-  const bestPace = paces.length>0 ? Math.min(...paces) : 280; // ~4:40/km
+  // VDOT-style: based on BEST recent performance (top 3 fastest)
+  const sortedPaces = [...paces].sort((a,b)=>a-b);
+  const bestPace = sortedPaces.length >= 3 
+    ? sortedPaces.slice(0,3).reduce((a,b)=>a+b,0)/3 
+    : (sortedPaces[0] || 280);
+  // Also calculate recent average for reference
+  const recentAvgPace = paces.length > 0 ? paces.reduce((a,b)=>a+b,0)/paces.length : null;
   const halfPace = bestPace * 1.08; // 8% slower for HM
   const halfSec = halfPace * 21.1;
   const halfStr = secToTime(halfSec);
@@ -1388,9 +1393,10 @@ function render() {
 
   // Goal path
   const goalPace = 313; // 5:13/km for sub-1:50
-  const currentPace = avgPace || 380; // ~6:20
+  const currentPace = bestPace; // Using best pace for race prediction
   const gapSec = currentPace - goalPace;
   const gapPct = Math.round((1 - goalPace/currentPace)*100);
+  const avgPaceStr = recentAvgPace ? fmtPace(recentAvgPace) : '—';
   document.getElementById('pathAnalysis').innerHTML = `
     <div style="padding:16px">
       <div style="margin-bottom:12px">
@@ -1407,6 +1413,8 @@ function render() {
       </div>
       <div style="margin-top:12px;font-size:12px;line-height:1.6;color:var(--text2)">
         <strong>📅 時間表：</strong>5個月到 Dec 2026<br>
+        <strong>🏆 最佳配速：</strong>${fmtPace(bestPace)}（基於最近最快3次）<br>
+        <strong>📊 平均配速：</strong>${avgPaceStr}（所有訓練）<br>
         <strong>📊 每月目標：</strong>每月配速進步 ~${Math.round(gapPct/5)}%<br>
         <strong>🏃 關鍵訓練：</strong>Base phase 打好 aerobic base → Build phase 加 tempo/intervals → Peak phase race pace work
       </div>
