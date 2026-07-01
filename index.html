@@ -1917,7 +1917,7 @@ function render() {
     const ws = d.weekly_stats;
   
     // Collect all running activities with form data
-    const runActs = ws.flatMap(s=>s.activities).filter(a=>'run' in a.type && a.avg_cadence).sort((a,b)=>b.date.localeCompare(a.date));
+    const runActs = ws.flatMap(s=>s.activities).filter(a=>a.type.includes('run') && a.avg_cadence).sort((a,b)=>b.date.localeCompare(a.date));
   
     if (runActs.length === 0) {
       document.getElementById('formCadence').textContent = '—';
