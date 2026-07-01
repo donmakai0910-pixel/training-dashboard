@@ -482,86 +482,366 @@
 
 <!-- ════════════ TAB 5: RUNNING FORM ════════════ -->
 <div class="tab-content" id="tab-form">
-  <!-- Form Overview -->
-  <div class="grid grid-4" id="formCards">
-    <div class="card stat-card">
-      <div class="card-title">🏃 平均步頻</div>
-      <div class="stat-value"><span id="formCadence">—</span><span class="unit"> spm</span></div>
-      <div class="stat-label" id="cadenceStatus">理想 170-180</div>
-    </div>
-    <div class="card stat-card">
-      <div class="card-title">📏 平均步幅</div>
-      <div class="stat-value"><span id="formStride">—</span><span class="unit"> cm</span></div>
-      <div class="stat-label" id="strideStatus">理想 110-130</div>
-    </div>
-    <div class="card stat-card">
-      <div class="card-title">🦶 觸地時間</div>
-      <div class="stat-value"><span id="formGCT">—</span><span class="unit"> ms</span></div>
-      <div class="stat-label" id="gctStatus">理想 200-280</div>
-    </div>
-    <div class="card stat-card">
-      <div class="card-title">↕️ 垂直振幅</div>
-      <div class="stat-value"><span id="formVO">—</span><span class="unit"> cm</span></div>
-      <div class="stat-label" id="voStatus">理想 6-8</div>
+  <!-- ═══ Hero Section: Form Score ═══ -->
+  <div class="form-hero">
+    <div class="form-hero-bg"></div>
+    <div class="form-hero-content">
+      <div class="form-hero-left">
+        <div class="form-hero-label">跑姿評分</div>
+        <div class="form-hero-score" id="formOverallScore">—</div>
+        <div class="form-hero-grade" id="formOverallGrade">—</div>
+        <div class="form-hero-verdict" id="formVerdict">—</div>
+      </div>
+      <div class="form-hero-right">
+        <div class="form-ring" id="formRing">
+          <svg viewBox="0 0 120 120" class="form-ring-svg">
+            <circle cx="60" cy="60" r="52" class="ring-bg"/>
+            <circle cx="60" cy="60" r="52" class="ring-fill" id="ringFill" stroke-dasharray="327" stroke-dashoffset="327"/>
+            <circle cx="60" cy="60" r="43" class="ring-bg"/>
+            <circle cx="60" cy="60" r="43" class="ring-fill2" id="ringFill2" stroke-dasharray="270" stroke-dashoffset="270"/>
+            <circle cx="60" cy="60" r="34" class="ring-bg"/>
+            <circle cx="60" cy="60" r="34" class="ring-fill3" id="ringFill3" stroke-dasharray="214" stroke-dashoffset="214"/>
+            <circle cx="60" cy="60" r="25" class="ring-bg"/>
+            <circle cx="60" cy="60" r="25" class="ring-fill4" id="ringFill4" stroke-dasharray="157" stroke-dashoffset="157"/>
+          </svg>
+          <div class="form-ring-center">
+            <span class="form-ring-emoji" id="ringEmoji">🏃</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Form Charts -->
+  <!-- ═══ Metric Gauge Cards ═══ -->
+  <div class="form-gauges">
+    <div class="gauge-card" id="gaugeCadence">
+      <div class="gauge-label">
+        <span class="gauge-icon">🏃</span>
+        <span>步頻 (Cadence)</span>
+        <span class="gauge-unit">spm</span>
+      </div>
+      <div class="gauge-bar-container">
+        <div class="gauge-bar">
+          <div class="gauge-fill" id="gaugeCadenceFill" style="width:0%"></div>
+        </div>
+        <div class="gauge-target-mark" id="gaugeCadenceMark" style="left:0%">|</div>
+      </div>
+      <div class="gauge-stats">
+        <span class="gauge-value" id="gaugeCadenceVal">—</span>
+        <span class="gauge-target">目標 170+</span>
+        <span class="gauge-best" id="gaugeCadenceBest">—</span>
+      </div>
+      <div class="gauge-status" id="gaugeCadenceStatus">—</div>
+    </div>
+
+    <div class="gauge-card" id="gaugeStride">
+      <div class="gauge-label">
+        <span class="gauge-icon">📏</span>
+        <span>步幅 (Stride)</span>
+        <span class="gauge-unit">cm</span>
+      </div>
+      <div class="gauge-bar-container">
+        <div class="gauge-bar">
+          <div class="gauge-fill" id="gaugeStrideFill" style="width:0%"></div>
+        </div>
+        <div class="gauge-target-range" id="gaugeStrideRange" style="left:45%;width:20%"></div>
+      </div>
+      <div class="gauge-stats">
+        <span class="gauge-value" id="gaugeStrideVal">—</span>
+        <span class="gauge-target">理想 100-130</span>
+        <span class="gauge-best" id="gaugeStrideTM">跑步機 —</span>
+      </div>
+      <div class="gauge-status" id="gaugeStrideStatus">—</div>
+    </div>
+
+    <div class="gauge-card" id="gaugeGCT">
+      <div class="gauge-label">
+        <span class="gauge-icon">🦶</span>
+        <span>觸地時間 (GCT)</span>
+        <span class="gauge-unit">ms</span>
+      </div>
+      <div class="gauge-bar-container">
+        <div class="gauge-bar">
+          <div class="gauge-fill" id="gaugeGCTFill" style="width:0%"></div>
+        </div>
+        <div class="gauge-target-mark" id="gaugeGCTMark" style="left:0%">|</div>
+      </div>
+      <div class="gauge-stats">
+        <span class="gauge-value" id="gaugeGCTVal">—</span>
+        <span class="gauge-target">理想 &lt;280</span>
+        <span class="gauge-best" id="gaugeGCTBest">最快 —</span>
+      </div>
+      <div class="gauge-status" id="gaugeGCTStatus">—</div>
+    </div>
+
+    <div class="gauge-card" id="gaugeVO">
+      <div class="gauge-label">
+        <span class="gauge-icon">↕️</span>
+        <span>垂直振幅 (VO)</span>
+        <span class="gauge-unit">cm</span>
+      </div>
+      <div class="gauge-bar-container">
+        <div class="gauge-bar">
+          <div class="gauge-fill" id="gaugeVOFill" style="width:0%"></div>
+        </div>
+        <div class="gauge-target-mark" id="gaugeVOMark" style="left:0%">|</div>
+      </div>
+      <div class="gauge-stats">
+        <span class="gauge-value" id="gaugeVOVal">—</span>
+        <span class="gauge-target">理想 &lt;8</span>
+        <span class="gauge-best" id="gaugeVOBest">最佳 —</span>
+      </div>
+      <div class="gauge-status" id="gaugeVOStatus">—</div>
+    </div>
+  </div>
+
+  <!-- ═══ Charts Row ═══ -->
   <div class="grid grid-2" style="margin-top:14px">
     <div class="card">
-      <div class="card-title">🏃 步頻 vs 配速 <span class="badge">理想 cadence 170+</span></div>
+      <div class="card-title">
+        <span>🎯 步頻 x 配速</span>
+        <span class="badge">每個點=一次跑步</span>
+      </div>
       <div class="chart-container"><canvas id="cadenceChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">📏 步幅 vs 配速 <span class="badge">戶外 vs 跑步機</span></div>
-      <div class="chart-container"><canvas id="strideChart"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Form Detail Cards -->
-  <div class="grid" style="margin-top:14px">
-    <div class="card">
-      <div class="card-title">🦶 觸地時間趨勢 <span class="badge">越低越好</span></div>
-      <div class="chart-container"><canvas id="gctChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="grid grid-2" style="margin-top:14px">
-    <div class="card">
-      <div class="card-title">↕️ 垂直振幅趨勢 <span class="badge">越低越省力</span></div>
-      <div class="chart-container"><canvas id="voChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📊 跑步機 vs 戶外對比 <span class="badge">差異越大問題越多</span></div>
+      <div class="card-title">
+        <span>🏟️ 跑步機 vs 戶外</span>
+        <span class="badge">5維度對比</span>
+      </div>
       <div class="chart-container"><canvas id="surfaceChart"></canvas></div>
     </div>
   </div>
 
-  <!-- AI Form Coach -->
-  <div class="card coach-card" style="margin-top:14px">
-    <div class="coach-header">
-      <div class="coach-avatar" style="background:linear-gradient(135deg,var(--orange),var(--red))">🔬</div>
-      <div>
-        <div class="coach-name">跑姿分析教練</div>
-        <div class="coach-title">基於 Garmin 數據嘅專業跑姿評估</div>
+  <div class="grid grid-3" style="margin-top:14px">
+    <div class="card">
+      <div class="card-title">
+        <span>🦶 觸地時間趨勢</span>
+        <span class="badge" style="background:rgba(139,108,247,0.15);color:var(--purple)">越低越好</span>
       </div>
+      <div class="chart-container" style="height:180px"><canvas id="gctChart"></canvas></div>
     </div>
-    <div id="formCoach" style="font-size:13px;line-height:1.7;color:var(--text2)">載入中...</div>
+    <div class="card">
+      <div class="card-title">
+        <span>↕️ 垂直振幅趨勢</span>
+        <span class="badge" style="background:rgba(245,182,66,0.15);color:var(--accent3)">越低越省力</span>
+      </div>
+      <div class="chart-container" style="height:180px"><canvas id="voChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <span>📏 步幅對比</span>
+        <span class="badge">跑步機 vs 戶外</span>
+      </div>
+      <div class="chart-container" style="height:180px"><canvas id="strideChart"></canvas></div>
+    </div>
   </div>
 
-  <!-- Recent runs form data table -->
+  <!-- ═══ AI Form Coach ═══ -->
+  <div class="form-coach-card" style="margin-top:14px">
+    <div class="form-coach-top">
+      <div class="form-coach-avatar">
+        <div class="form-coach-icon">🔬</div>
+      </div>
+      <div>
+        <div class="form-coach-name">跑姿分析教練</div>
+        <div class="form-coach-title">基於 Garmin 數據 · 專業跑姿評估</div>
+      </div>
+    </div>
+    <div id="formCoach" class="form-coach-body">載入中...</div>
+  </div>
+
+  <!-- ═══ Form Data Table ═══ -->
   <div class="card" style="margin-top:14px">
-    <div class="card-title">🔬 最近跑步嘅 form 數據 <span class="badge">撳活動名睇建議</span></div>
+    <div class="card-title">
+      <span>📋 最近跑步數據</span>
+      <span class="badge">20次記錄</span>
+    </div>
     <div style="overflow-x:auto">
-      <table class="week-table">
-        <thead><tr><th>日期</th><th>活動</th><th>配速</th><th>Cadence</th><th>Stride</th><th>GCT</th><th>Vert Osc</th><th>Ratio</th><th>Steps</th></tr></thead>
+      <table class="form-data-table">
+        <thead><tr>
+          <th>日期</th><th>活動</th><th>配速</th><th class="col-cad">🏃 Cad</th><th class="col-str">📏 Str</th><th class="col-gct">🦶 GCT</th><th class="col-vo">↕️ VO</th><th class="col-ratio">📊 Ratio</th><th class="col-steps">👣 Steps</th>
+        </tr></thead>
         <tbody id="formTableBody"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- ════════════ TAB 6: AI COACH ════════════ -->
+<!-- ════════════ FORM STYLES ════════════ -->
+<style>
+  /* ── Hero Section ── */
+  .form-hero {
+    position: relative;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .form-hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(79,140,247,0.15), rgba(139,108,247,0.1));
+    border: 1px solid rgba(79,140,247,0.2);
+    border-radius: var(--radius);
+  }
+  .form-hero-content {
+    position: relative;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px;
+  }
+  .form-hero-left { flex: 1; }
+  .form-hero-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text2); font-weight: 600; margin-bottom: 4px; }
+  .form-hero-score { font-size: 56px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+  .form-hero-grade { font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .form-hero-verdict { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
+  
+  /* ── Ring ── */
+  .form-ring { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
+  .form-ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 4; }
+  .ring-fill, .ring-fill2, .ring-fill3, .ring-fill4 { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1); }
+  .ring-fill { stroke: var(--accent); }
+  .ring-fill2 { stroke: var(--accent2); }
+  .ring-fill3 { stroke: var(--accent3); }
+  .ring-fill4 { stroke: var(--purple); }
+  .form-ring-center {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .form-ring-emoji { font-size: 32px; animation: pulse-ring 2s ease-in-out infinite; }
+  @keyframes pulse-ring { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  
+  @media (max-width:640px) {
+    .form-hero-content { flex-direction: column; text-align: center; }
+    .form-hero-score { font-size: 40px; }
+    .form-ring { width: 100px; height: 100px; }
+  }
+
+  /* ── Gauge Cards ── */
+  .form-gauges {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width:900px) { .form-gauges { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width:640px) { .form-gauges { grid-template-columns: 1fr; } }
+
+  .gauge-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .gauge-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    transition: background 0.5s;
+  }
+  .gauge-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .gauge-label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); font-weight: 500; margin-bottom: 10px; }
+  .gauge-icon { font-size: 14px; }
+  .gauge-unit { color: var(--text3); font-size: 10px; margin-left: auto; }
+  
+  .gauge-bar-container { position: relative; height: 8px; margin-bottom: 8px; }
+  .gauge-bar { height: 100%; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .gauge-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.22,1,0.36,1); }
+  .gauge-target-mark {
+    position: absolute; top: -4px; width: 2px; height: 16px;
+    background: var(--red2); border-radius: 1px;
+    font-size: 0; transition: left 0.5s;
+  }
+  .gauge-target-range {
+    position: absolute; top: -2px; height: 12px;
+    background: rgba(59,206,138,0.15);
+    border: 1px dashed rgba(59,206,138,0.3);
+    border-radius: 2px;
+    transition: left 0.5s, width 0.5s;
+  }
+  
+  .gauge-stats { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .gauge-value { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .gauge-target { font-size: 10px; color: var(--text3); }
+  .gauge-best { font-size: 10px; color: var(--accent2); margin-left: auto; }
+  
+  .gauge-status {
+    font-size: 10px; font-weight: 600; margin-top: 6px;
+    padding: 2px 8px; border-radius: 10px;
+    display: inline-block;
+  }
+
+  /* Gauge colors */
+  #gaugeCadence .gauge-fill { background: linear-gradient(90deg, var(--red), var(--accent3), var(--accent2)); }
+  #gaugeCadence::before { background: linear-gradient(90deg, var(--red), var(--accent3), var(--accent2)); }
+  #gaugeCadence .gauge-value { color: var(--accent); }
+  
+  #gaugeStride .gauge-fill { background: linear-gradient(90deg, var(--accent), var(--purple)); }
+  #gaugeStride::before { background: linear-gradient(90deg, var(--accent), var(--purple)); }
+  #gaugeStride .gauge-value { color: var(--purple); }
+  
+  #gaugeGCT .gauge-fill { background: linear-gradient(90deg, var(--red), var(--accent3), var(--accent2)); }
+  #gaugeGCT::before { background: linear-gradient(90deg, var(--red), var(--accent3), var(--accent2)); }
+  #gaugeGCT .gauge-value { color: var(--purple); }
+  
+  #gaugeVO .gauge-fill { background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--red)); }
+  #gaugeVO::before { background: linear-gradient(90deg, var(--accent2), var(--accent3), var(--red)); }
+  #gaugeVO .gauge-value { color: var(--accent3); }
+
+  /* ── Form Coach ── */
+  .form-coach-card {
+    background: linear-gradient(135deg, rgba(79,140,247,0.06), rgba(59,206,138,0.06));
+    border: 1px solid rgba(79,140,247,0.15);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .form-coach-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .form-coach-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--red));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .form-coach-icon { font-size: 20px; }
+  .form-coach-name { font-size: 15px; font-weight: 700; }
+  .form-coach-title { font-size: 11px; color: var(--text2); }
+  .form-coach-body { font-size: 13px; line-height: 1.7; color: var(--text2); }
+  .form-coach-body strong { color: var(--text); }
+
+  /* ── Data Table ── */
+  .form-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .form-data-table th {
+    text-align: left; padding: 8px 6px;
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text2); font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .form-data-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .form-data-table tr:last-child td { border: none; }
+  .form-data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .form-data-table .col-cad, .form-data-table td:nth-child(4) { font-weight: 700; font-family: var(--mono); }
+  .form-data-table .col-str, .form-data-table td:nth-child(5),
+  .form-data-table .col-gct, .form-data-table td:nth-child(6),
+  .form-data-table .col-vo, .form-data-table td:nth-child(7),
+  .form-data-table .col-ratio, .form-data-table td:nth-child(8),
+  .form-data-table .col-steps, .form-data-table td:nth-child(9) {
+    font-family: var(--mono); font-size: 11px; color: var(--text2);
+  }
+  .form-data-table td:nth-child(2) { font-weight: 500; }
+  .form-data-table td:first-child { font-size: 11px; color: var(--text3); }
+</style>
 <div class="tab-content" id="tab-coach">
   <div class="card coach-card">
     <div class="coach-header">
@@ -1914,205 +2194,176 @@ function render() {
 
   // ── Running Form Analysis ──
   function renderForm(d) {
-    const ws = d.weekly_stats;
+      const ws = d.weekly_stats;
   
-    // Collect all running activities with form data
-    const runActs = ws.flatMap(s=>s.activities).filter(a=>a.type.includes('run') && a.avg_cadence).sort((a,b)=>b.date.localeCompare(a.date));
+      // Collect all running activities with form data
+      const runActs = ws.flatMap(s=>s.activities).filter(a=>a.type.includes('run') && a.avg_cadence).sort((a,b)=>b.date.localeCompare(a.date));
   
-    if (runActs.length === 0) {
-      document.getElementById('formCadence').textContent = '—';
-      document.getElementById('formStride').textContent = '—';
-      document.getElementById('formGCT').textContent = '—';
-      document.getElementById('formVO').textContent = '—';
-      document.getElementById('formCoach').innerHTML = '<div class="coach-advice">未有跑步 form 數據。請著住 Garmin 錶跑步，佢會自動記錄 cadence、stride 等資料。</div>';
-      return;
-    }
-  
-    // Averages
-    const avgCad = runActs.reduce((s,a)=>s+a.avg_cadence,0)/runActs.length;
-    const avgStr = runActs.reduce((s,a)=>s+(a.avg_stride_length_cm||0),0)/runActs.filter(a=>a.avg_stride_length_cm).length;
-    const avgGct = runActs.reduce((s,a)=>s+(a.avg_ground_contact_ms||0),0)/runActs.filter(a=>a.avg_ground_contact_ms).length;
-    const avgVo = runActs.reduce((s,a)=>s+(a.avg_vertical_oscillation_cm||0),0)/runActs.filter(a=>a.avg_vertical_oscillation_cm).length;
-  
-    // Stat cards
-    document.getElementById('formCadence').textContent = avgCad.toFixed(0);
-    document.getElementById('formStride').textContent = avgStr.toFixed(0);
-    document.getElementById('formGCT').textContent = avgGct.toFixed(0);
-    document.getElementById('formVO').textContent = avgVo.toFixed(1);
-  
-    // Status labels with colors
-    const st = (id, val, good, ok, bad) => {
-      const el = document.getElementById(id);
-      if (val <= good[0] && val >= good[1]) { el.textContent = ok; el.style.color = 'var(--accent2)'; }
-      else { el.textContent = bad; el.style.color = 'var(--red)'; }
-    };
-    st('cadenceStatus', avgCad, [170,180], '✅ 理想範圍', '⚠️ 需要提升');
-    st('strideStatus', avgStr, [100,130], '✅ 正常範圍', '⚠️ 需要調整');
-    st('gctStatus', avgGct, [200,280], '✅ 良好', '⚠️ 偏長');
-    st('voStatus', avgVo, [6,8], '✅ 優秀', '⚠️ 偏高浪費能量');
-  
-    // ── Cadence vs Pace chart ──
-    const cadRuns = runActs.filter(a=>a.pace_sec_km).slice(0,15);
-    new Chart(document.getElementById('cadenceChart'),{
-      type:'scatter',
-      data:{
-        datasets:[{
-          label:'步頻 vs 配速',
-          data:cadRuns.map(a=>({x:a.pace_sec_km/60, y:a.avg_cadence})),
-          backgroundColor:'rgba(79,140,247,0.7)',
-          pointRadius:6, pointHoverRadius:8
-        },{
-          label:'理想 cadence 下限',
-          data:[{x:4,y:170},{x:10,y:170}],
-          borderColor:'rgba(59,206,138,0.4)', borderDash:[6,4],
-          pointRadius:0, showLine:true, fill:false
-        }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } },
-        scales:{
-          x:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>v.toFixed(1)+':00/km' }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'配速 (min/km)', color:'#7e8299', font:{size:11} } },
-          y:{ min:80, max:190, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'Cadence (spm)', color:'#7e8299', font:{size:11} } }
-        }
+      if (runActs.length === 0) {
+        document.getElementById('formOverallScore').textContent = '—';
+        document.getElementById('formCoach').innerHTML = '<div class="coach-advice">未有跑步 form 數據。請著住 Garmin 錶跑步，佢會自動記錄 cadence、stride 等資料。</div>';
+        return;
       }
-    });
   
-    // ── Stride chart (treadmill vs outdoor) ──
-    const tmActs = runActs.filter(a=>a.type==='treadmill_running' && a.avg_stride_length_cm);
-    const odActs = runActs.filter(a=>a.type==='running' && a.avg_stride_length_cm);
-    new Chart(document.getElementById('strideChart'),{
-      type:'bar',
-      data:{
-        labels:['跑步機','戶外'],
-        datasets:[{
-          label:'平均步幅 (cm)',
-          data:[
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmActs.length : 0,
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odActs.length : 0
-          ],
-          backgroundColor:['rgba(79,140,247,0.7)','rgba(59,206,138,0.7)'],
-          borderRadius:6, barPercentage:0.5
-        }]
-      },
-      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:12,weight:'600'} }, grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
-    });
+      // Averages
+      const avgCad = runActs.reduce((s,a)=>s+a.avg_cadence,0)/runActs.length;
+      const avgStr = runActs.reduce((s,a)=>s+(a.avg_stride_length_cm||0),0)/runActs.filter(a=>a.avg_stride_length_cm).length;
+      const avgGct = runActs.reduce((s,a)=>s+(a.avg_ground_contact_ms||0),0)/runActs.filter(a=>a.avg_ground_contact_ms).length;
+      const avgVo = runActs.reduce((s,a)=>s+(a.avg_vertical_oscillation_cm||0),0)/runActs.filter(a=>a.avg_vertical_oscillation_cm).length;
+    
+      // Best values
+      const bestCad = Math.max(...runActs.map(a=>a.avg_cadence));
+      const bestGct = Math.min(...runActs.filter(a=>a.avg_ground_contact_ms).map(a=>a.avg_ground_contact_ms));
+      const bestVo = Math.min(...runActs.filter(a=>a.avg_vertical_oscillation_cm).map(a=>a.avg_vertical_oscillation_cm));
+    
+      // ── Overall Score ──
+      // Score formula: weighted composite of 4 metrics
+      const cadScore_pct = Math.min(Math.round(avgCad / 180 * 100), 100);
+      const gctScore_pct = Math.min(Math.round((1 - (avgGct - 150) / 200) * 100), 100);
+      const voScore_pct = Math.min(Math.round((1 - (avgVo - 4) / 12) * 100), 100);
+      const strideScore_pct = Math.min(Math.round((1 - Math.abs(avgStr - 115) / 80) * 100), 100);
+      const overall = Math.round((cadScore_pct * 0.35 + strideScore_pct * 0.2 + gctScore_pct * 0.25 + voScore_pct * 0.2));
+    
+      document.getElementById('formOverallScore').textContent = overall;
+      const grade = overall >= 85 ? 'A' : overall >= 70 ? 'B' : overall >= 55 ? 'C' : overall >= 40 ? 'D' : 'F';
+      const gradeColor = overall >= 85 ? 'var(--accent2)' : overall >= 70 ? 'var(--accent)' : overall >= 55 ? 'var(--accent3)' : 'var(--red)';
+      document.getElementById('formOverallGrade').textContent = `等級 ${grade}`;
+      document.getElementById('formOverallGrade').style.color = gradeColor;
+      document.getElementById('formOverallScore').style.color = gradeColor;
+    
+      // Verdict + Emoji
+      let verdict = '', emoji = '🏃';
+      if (overall >= 85) { verdict = '優秀跑姿！保持住，專注比賽準備 💪'; emoji = '🏆'; }
+      else if (overall >= 70) { verdict = '良好基礎！Cadence 提升到 170+ 就完美 👍'; emoji = '💪'; }
+      else if (overall >= 55) { verdict = '需要改善。主力提升 cadence 同減少 bounce 🔧'; emoji = '🔧'; }
+      else { verdict = '需要大改！Cadence 嚴重偏低，建議用 metronome 訓練 ⚠️'; emoji = '⚠️'; }
+      document.getElementById('formVerdict').textContent = verdict;
+      document.getElementById('ringEmoji').textContent = emoji;
+    
+      // Ring animation
+      setTimeout(() => {
+        const circ = 2 * Math.PI * 52;
+        document.getElementById('ringFill').style.strokeDashoffset = circ * (1 - cadScore_pct/100);
+        document.getElementById('ringFill2').style.strokeDashoffset = 2 * Math.PI * 43 * (1 - strideScore_pct/100);
+        document.getElementById('ringFill3').style.strokeDashoffset = 2 * Math.PI * 34 * (1 - gctScore_pct/100);
+        document.getElementById('ringFill4').style.strokeDashoffset = 2 * Math.PI * 25 * (1 - voScore_pct/100);
+      }, 100);
+    
+      // ── Gauge Cards ──
+      const fmtGauge = (id, val, max, target) => {
+        const pct = Math.min(Math.round(val / max * 100), 100);
+        document.getElementById(id+'Fill').style.width = pct + '%';
+      };
+      fmtGauge('gaugeCadence', avgCad, 190, 170);
+      document.getElementById('gaugeCadenceVal').textContent = avgCad.toFixed(0);
+      document.getElementById('gaugeCadenceBest').textContent = `最佳 ${bestCad}`;
+      document.getElementById('gaugeCadenceMark').style.left = Math.round(170/190*100) + '%';
+    
+      document.getElementById('gaugeStrideVal').textContent = avgStr.toFixed(0);
+      const tmStr = runActs.filter(a=>a.type==='treadmill_running' && a.avg_stride_length_cm);
+      const odStr = runActs.filter(a=>a.type==='running' && a.avg_stride_length_cm);
+      const tmStrAvg = tmStr.length ? tmStr.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmStr.length : 0;
+      const odStrAvg = odStr.length ? odStr.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odStr.length : 0;
+      document.getElementById('gaugeStrideTM').textContent = `跑步機 ${tmStrAvg.toFixed(0)}`;
+      document.getElementById('gaugeStrideFill').style.width = Math.round(avgStr / 200 * 100) + '%';
+    
+      document.getElementById('gaugeGCTVal').textContent = avgGct.toFixed(0);
+      document.getElementById('gaugeGCTBest').textContent = `最快 ${bestGct}`;
+      document.getElementById('gaugeGCTFill').style.width = Math.round(avgGct / 400 * 100) + '%';
+      document.getElementById('gaugeGCTMark').style.left = Math.round(280/400*100) + '%';
+    
+      document.getElementById('gaugeVOVal').textContent = avgVo.toFixed(1);
+      document.getElementById('gaugeVOBest').textContent = `最佳 ${bestVo.toFixed(1)}`;
+      document.getElementById('gaugeVOFill').style.width = Math.round(avgVo / 16 * 100) + '%';
+      document.getElementById('gaugeVOMark').style.left = Math.round(8/16*100) + '%';
+    
+      // Gauge statuses
+      const setStatus = (id, val, good, ok, warn, bad) => {
+        const el = document.getElementById(id);
+        if (val <= good[0] && val >= good[1]) { el.textContent = ok; el.style.background = 'rgba(59,206,138,0.15)'; el.style.color = 'var(--accent2)'; }
+        else { el.textContent = bad; el.style.background = 'rgba(240,101,101,0.1)'; el.style.color = 'var(--red)'; }
+      };
+      setStatus('gaugeCadenceStatus', avgCad, [170,180], '✅ 理想', '⚠️ 偏低', '🔴 太低');
+      setStatus('gaugeGCTStatus', avgGct, [200,280], '✅ 良好', '⚠️ 偏高', '⚠️ 偏長');
+      setStatus('gaugeVOStatus', avgVo, [6,8], '✅ 優秀', '⚠️ 偏高', '🔴 過高');
+      // Stride status
+      const se2 = document.getElementById('gaugeStrideStatus');
+      if (avgStr >= 100 && avgStr <= 130) { se2.textContent = '✅ 正常'; se2.style.background = 'rgba(59,206,138,0.15)'; se2.style.color = 'var(--accent2)'; }
+      else if (avgStr > 130) { se2.textContent = '⚠️ 偏長'; se2.style.background = 'rgba(240,101,101,0.1)'; se2.style.color = 'var(--red)'; }
+      else { se2.textContent = '⚠️ 偏短'; se2.style.background = 'rgba(251,191,36,0.1)'; se2.style.color = 'var(--accent3)'; }
   
-    // ── GCT trend ──
-    const recentRuns = [...runActs].reverse().slice(-20);
-    new Chart(document.getElementById('gctChart'),{
-      type:'line',
-      data:{
-        labels:recentRuns.map(a=>a.date.slice(5)),
-        datasets:[{
-          label:'觸地時間 (ms)',
-          data:recentRuns.map(a=>a.avg_ground_contact_ms),
-          borderColor:'rgba(139,108,247,0.8)', backgroundColor:'rgba(139,108,247,0.1)',
-          fill:true, tension:0.3, pointBackgroundColor:'#8b6cf7', pointRadius:4, borderWidth:2
-        },{
-          label:'理想上限 280ms',
-          data:recentRuns.map(()=>280),
-          borderColor:'rgba(240,101,101,0.4)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false
-        }]
-      },
-      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
-    });
+      // ── Charts remain the same ──
+      const cadRuns = runActs.filter(a=>a.pace_sec_km).slice(0,15);
+      new Chart(document.getElementById('cadenceChart'),{
+        type:'scatter',
+        data:{ datasets:[{ label:'步頻 vs 配速', data:cadRuns.map(a=>({x:a.pace_sec_km/60, y:a.avg_cadence})), backgroundColor:'rgba(79,140,247,0.7)', pointRadius:6, pointHoverRadius:8 },{ label:'理想下限 170', data:[{x:4,y:170},{x:10,y:170}], borderColor:'rgba(59,206,138,0.4)', borderDash:[6,4], pointRadius:0, showLine:true, fill:false }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>v.toFixed(1)+':00/km' }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'配速 (min/km)', color:'#7e8299', font:{size:11} } }, y:{ min:80, max:190, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'Cadence (spm)', color:'#7e8299', font:{size:11} } } } }
+      });
+    
+      const tmActs = runActs.filter(a=>a.type==='treadmill_running' && a.avg_stride_length_cm);
+      const odActs = runActs.filter(a=>a.type==='running' && a.avg_stride_length_cm);
+      new Chart(document.getElementById('strideChart'),{
+        type:'bar',
+        data:{ labels:['跑步機','戶外'], datasets:[{ label:'步幅 (cm)', data:[tmActs.length?tmActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmActs.length:0, odActs.length?odActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odActs.length:0], backgroundColor:['rgba(79,140,247,0.7)','rgba(59,206,138,0.7)'], borderRadius:6, barPercentage:0.5 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:12,weight:'600'} }, grid:{ display:false } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+      });
+    
+      const recentRuns = [...runActs].reverse().slice(-20);
+      new Chart(document.getElementById('gctChart'),{
+        type:'line',
+        data:{ labels:recentRuns.map(a=>a.date.slice(5)), datasets:[{ label:'觸地時間 (ms)', data:recentRuns.map(a=>a.avg_ground_contact_ms), borderColor:'rgba(139,108,247,0.8)', backgroundColor:'rgba(139,108,247,0.1)', fill:true, tension:0.3, pointBackgroundColor:'#8b6cf7', pointRadius:4, borderWidth:2 },{ label:'理想上限 280ms', data:recentRuns.map(()=>280), borderColor:'rgba(240,101,101,0.4)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:10} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+      });
+    
+      new Chart(document.getElementById('voChart'),{
+        type:'line',
+        data:{ labels:recentRuns.map(a=>a.date.slice(5)), datasets:[{ label:'垂直振幅 (cm)', data:recentRuns.map(a=>a.avg_vertical_oscillation_cm), borderColor:'rgba(245,182,66,0.8)', backgroundColor:'rgba(245,182,66,0.1)', fill:true, tension:0.3, pointBackgroundColor:'#f5b642', pointRadius:4, borderWidth:2 },{ label:'理想上限 8cm', data:recentRuns.map(()=>8), borderColor:'rgba(240,101,101,0.4)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:10} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
+      });
+    
+      new Chart(document.getElementById('surfaceChart'),{
+        type:'radar',
+        data:{ labels:['Cadence','Stride','GCT','Vert Osc','Ratio'], datasets:[{ label:'跑步機', data:[tmActs.length?tmActs.reduce((s,a)=>s+a.avg_cadence,0)/tmActs.length:0, tmActs.length?tmActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmActs.length:0, tmActs.length?tmActs.reduce((s,a)=>s+a.avg_ground_contact_ms,0)/tmActs.length:0, tmActs.length?tmActs.reduce((s,a)=>s+a.avg_vertical_oscillation_cm,0)/tmActs.length:0, tmActs.length?tmActs.reduce((s,a)=>s+a.avg_vertical_ratio||0,0)/tmActs.length:0], borderColor:'rgba(79,140,247,0.6)', backgroundColor:'rgba(79,140,247,0.08)', pointBackgroundColor:'#4f8cf7', borderWidth:2 },{ label:'戶外', data:[odActs.length?odActs.reduce((s,a)=>s+a.avg_cadence,0)/odActs.length:0, odActs.length?odActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odActs.length:0, odActs.length?odActs.reduce((s,a)=>s+a.avg_ground_contact_ms,0)/odActs.length:0, odActs.length?odActs.reduce((s,a)=>s+a.avg_vertical_oscillation_cm,0)/odActs.length:0, odActs.length?odActs.reduce((s,a)=>s+a.avg_vertical_ratio||0,0)/odActs.length:0], borderColor:'rgba(59,206,138,0.6)', backgroundColor:'rgba(59,206,138,0.08)', pointBackgroundColor:'#3bce8a', borderWidth:2 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ r:{ ticks:{ color:'#7e8299', backdropColor:'transparent', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.4)' }, angleLines:{ color:'rgba(37,41,64,0.4)' }, pointLabels:{ color:'#e8ebf2', font:{size:11,weight:'600'} }, beginAtZero:true } } }
+      });
   
-    // ── Vertical Oscillation trend ──
-    new Chart(document.getElementById('voChart'),{
-      type:'line',
-      data:{
-        labels:recentRuns.map(a=>a.date.slice(5)),
-        datasets:[{
-          label:'垂直振幅 (cm)',
-          data:recentRuns.map(a=>a.avg_vertical_oscillation_cm),
-          borderColor:'rgba(245,182,66,0.8)', backgroundColor:'rgba(245,182,66,0.1)',
-          fill:true, tension:0.3, pointBackgroundColor:'#f5b642', pointRadius:4, borderWidth:2
-        },{
-          label:'理想上限 8cm',
-          data:recentRuns.map(()=>8),
-          borderColor:'rgba(240,101,101,0.4)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false
-        }]
-      },
-      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ beginAtZero:true, ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
-    });
+      // ── AI Form Coach ──
+      const cadScore = avgCad >= 170 ? '✅ 理想' : avgCad >= 155 ? '⚠️ 偏低' : '🔴 嚴重偏低';
+      const strScore = avgStr > 140 ? '⚠️ 偏長' : avgStr < 90 ? '⚠️ 偏短' : '✅ 正常';
+      const gctScore = avgGct <= 280 ? '✅ 良好' : '⚠️ 偏長';
+      const voScore = avgVo <= 8 ? '✅ 優秀' : avgVo <= 10 ? '⚠️ 偏高' : '🔴 過高';
+    
+      document.getElementById('formCoach').innerHTML = `
+        <div class="form-coach-body">
+          <strong>🔬 綜合評分：${overall}/100（${grade}級）</strong><br><br>
+          <strong>🏃 步頻：${cadScore}</strong> — ${avgCad.toFixed(0)} spm（目標 170+）<br>
+          <em>🎯 改善：下載 metronome app（Run Tempo），set 165bpm，所有跑都跟住</em><br><br>
+          <strong>📏 步幅：${strScore}</strong> — ${avgStr.toFixed(0)} cm（跑步機 ${tmStrAvg.toFixed(0)} vs 戶外 ${odStrAvg.toFixed(0)}）<br>
+          <em>🎯 改善：跑步機 stride set 返同戶外差唔多（110-130cm）</em><br><br>
+          <strong>🦶 觸地時間：${gctScore}</strong> — ${avgGct.toFixed(0)} ms<br>
+          ${avgGct > 280 ? '<em>🎯 改善：專注 midfoot landing，避免 heel strike</em>' : '✅ 保持！'}<br><br>
+          <strong>↕️ 垂直振幅：${voScore}</strong> — ${avgVo.toFixed(1)} cm<br>
+          ${avgVo > 8 ? '<em>🎯 改善：想像頭頂有天花板，run like you\'re sneaking</em>' : '✅ 優秀經濟性！'}<br><br>
+          <strong>📊 強度分布：</strong>你嘅訓練比例偏向高強度，Base phase 應該 <strong>80% easy / 20% hard</strong>。慢啲、長啲、多啲！
+        </div>
+      `;
   
-    // ── Surface comparison chart ──
-    new Chart(document.getElementById('surfaceChart'),{
-      type:'radar',
-      data:{
-        labels:['Cadence','Stride','GCT','Vert Osc','Ratio'],
-        datasets:[
-          { label:'跑步機', data:[
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_cadence,0)/tmActs.length : 0,
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmActs.length : 0,
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_ground_contact_ms,0)/tmActs.length : 0,
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_vertical_oscillation_cm,0)/tmActs.length : 0,
-            tmActs.length ? tmActs.reduce((s,a)=>s+a.avg_vertical_ratio||0,0)/tmActs.length : 0
-          ], borderColor:'rgba(79,140,247,0.6)', backgroundColor:'rgba(79,140,247,0.08)', pointBackgroundColor:'#4f8cf7', borderWidth:2 },
-          { label:'戶外', data:[
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_cadence,0)/odActs.length : 0,
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odActs.length : 0,
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_ground_contact_ms,0)/odActs.length : 0,
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_vertical_oscillation_cm,0)/odActs.length : 0,
-            odActs.length ? odActs.reduce((s,a)=>s+a.avg_vertical_ratio||0,0)/odActs.length : 0
-          ], borderColor:'rgba(59,206,138,0.6)', backgroundColor:'rgba(59,206,138,0.08)', pointBackgroundColor:'#3bce8a', borderWidth:2 }
-        ]
-      },
-      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ r:{ ticks:{ color:'#7e8299', backdropColor:'transparent', font:{size:10} }, grid:{ color:'rgba(37,41,64,0.4)' }, angleLines:{ color:'rgba(37,41,64,0.4)' }, pointLabels:{ color:'#e8ebf2', font:{size:11,weight:'600'} }, beginAtZero:true } } }
-    });
-  
-    // ── AI Form Coach ──
-    let coachMsg = '';
-    const cadScore = avgCad >= 170 ? '✅ 理想' : avgCad >= 155 ? '⚠️ 偏低' : '🔴 嚴重偏低';
-    const strScore = avgStr > 140 ? '⚠️ 偏長(跑步機)' : avgStr < 90 ? '⚠️ 偏短(戶外上斜)' : '✅ 正常';
-    const gctScore = avgGct <= 280 ? '✅ 良好' : '⚠️ 偏長';
-    const voScore = avgVo <= 8 ? '✅ 優秀' : avgVo <= 10 ? '⚠️ 偏高' : '🔴 過高';
-  
-    coachMsg = `
-      <div class="coach-advice">
-        <strong>🔬 跑姿評分：</strong><br><br>
-      
-        <strong>🏃 步頻：${cadScore}</strong> — ${avgCad.toFixed(0)} spm<br>
-        理想係 170-180 spm。你而家 cadence 偏低，每個 stride 太長 → overstriding → 膝頭壓力大。<br>
-        <em>🎯 改善：用 metronome set 165-170 bpm，跟住跑2-3週</em><br><br>
-      
-        <strong>📏 步幅：${strScore}</strong> — ${avgStr.toFixed(0)} cm<br>
-        跑步機 stride (${tmActs.length ? (tmActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/tmActs.length).toFixed(0) : '?'}cm) vs 戶外 (${odActs.length ? (odActs.reduce((s,a)=>s+a.avg_stride_length_cm,0)/odActs.length).toFixed(0) : '?'}cm)<br>
-        差異越大代表跑姿唔一致，跑步機養成嘅 motor pattern 唔適合戶外。<br>
-        <em>🎯 改善：跑步機 set 返同戶外差唔多嘅 stride length (110-130cm)</em><br><br>
-      
-        <strong>🦶 觸地時間：${gctScore}</strong> — ${avgGct.toFixed(0)} ms<br>
-        ${avgGct > 280 ? '觸地時間偏長，可能係 heel striking。試下 midfoot landing。' : '喺合理範圍內，繼續保持。'}<br>
-        <em>🎯 改善：專注 midfoot landing，避免 heel strike</em><br><br>
-      
-        <strong>↕️ 垂直振幅：${voScore}</strong> — ${avgVo.toFixed(1)} cm<br>
-        ${avgVo > 8 ? '垂直 bounce 太大，浪費能量向上碌。想像頭頂有塊天花板，保持身體水平。' : '良好嘅經濟性跑姿。'}<br>
-        <em>🎯 改善：「run like you're sneaking under a low ceiling」</em><br><br>
-      
-        <strong>📊 訓練強度分布：</strong><br>
-        你嘅訓練 ${runActs.filter(a=>a.aerobic_effect && a.aerobic_effect < 3).length}% 係 easy / ${runActs.filter(a=>a.aerobic_effect && a.aerobic_effect >= 3).length}% 係 hard<br>
-        理想比例係 <strong>80% easy / 20% hard</strong>。Base phase 要 focus aerobic base！
-      </div>
-    `;
-    document.getElementById('formCoach').innerHTML = coachMsg;
-  
-    // ── Form data table ──
-    const fmtPace = (s) => { if(!s)return'—'; const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; };
-    document.getElementById('formTableBody').innerHTML = runActs.slice(0,20).map(a=>`
-      <tr>
-        <td style="font-size:11px;color:var(--text2)">${a.date}</td>
-        <td style="font-weight:500">${a.name||'跑步'}</td>
-        <td style="font-family:var(--mono);font-size:11px">${fmtPace(a.pace_sec_km)}</td>
-        <td style="font-family:var(--mono);font-size:12px;font-weight:600;color:${a.avg_cadence>=170?'var(--accent2)':a.avg_cadence>=150?'var(--accent3)':'var(--red)'}">${a.avg_cadence}</td>
-        <td style="font-family:var(--mono);font-size:11px">${a.avg_stride_length_cm||'—'}</td>
-        <td style="font-family:var(--mono);font-size:11px">${a.avg_ground_contact_ms||'—'}</td>
-        <td style="font-family:var(--mono);font-size:11px">${a.avg_vertical_oscillation_cm||'—'}</td>
-        <td style="font-family:var(--mono);font-size:11px">${a.avg_vertical_ratio||'—'}</td>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${a.steps||'—'}</td>
-      </tr>
-    `).join('');
-  }
+      // ── Form data table ──
+      const fmtP = (s) => { if(!s)return'—'; const m=Math.floor(s/60); return m+':'+String(Math.round(s%60)).padStart(2,'0')+'/km'; };
+      document.getElementById('formTableBody').innerHTML = runActs.slice(0,20).map(a=>`
+        <tr>
+          <td style="font-size:11px;color:var(--text3)">${a.date}</td>
+          <td style="font-weight:500">${a.name||'跑步'}</td>
+          <td style="font-family:var(--mono);font-size:11px">${fmtP(a.pace_sec_km)}</td>
+          <td style="color:${a.avg_cadence>=170?'var(--accent2)':a.avg_cadence>=150?'var(--accent3)':'var(--red)'}">${a.avg_cadence}</td>
+          <td>${a.avg_stride_length_cm||'—'}</td>
+          <td>${a.avg_ground_contact_ms||'—'}</td>
+          <td>${a.avg_vertical_oscillation_cm||'—'}</td>
+          <td>${a.avg_vertical_ratio||'—'}</td>
+          <td>${a.steps||'—'}</td>
+        </tr>
+      `).join('');
+    }
 
 // ── Activity Detail Modal ──
 function showActivity(idx) {
