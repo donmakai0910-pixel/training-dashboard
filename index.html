@@ -2071,90 +2071,127 @@ function render() {
   document.getElementById('trendAnalysis').innerHTML = trend;
 
   // ── TAB 4: Race Predictor ──
-  // VDOT-style: based on BEST recent performance (top 3 fastest)
-  const sortedPaces = [...paces].sort((a,b)=>a-b);
-  const bestPace = sortedPaces.length >= 3 
-    ? sortedPaces.slice(0,3).reduce((a,b)=>a+b,0)/3 
-    : (sortedPaces[0] || 280);
-  // Also calculate recent average for reference
-  const recentAvgPace = paces.length > 0 ? paces.reduce((a,b)=>a+b,0)/paces.length : null;
-  const halfPace = bestPace * 1.08; // 8% slower for HM
-  const halfSec = halfPace * 21.1;
-  const halfStr = secToTime(halfSec);
-  document.getElementById('predictHalf').textContent = halfStr;
-  document.getElementById('predictHalfPace').textContent = fmtPace(halfPace);
-  document.getElementById('predict5k').textContent = secToTime(bestPace * 5 * 1.04);
-  document.getElementById('predict10k').textContent = secToTime(bestPace * 10 * 1.06);
-  document.getElementById('predictMarathon').textContent = secToTime(halfPace * 2 * 1.05);
+    // Estimate HM pace from recent running data
+    // Use average pace of all runs (not just best) - more realistic for HM
+    const allPaces = paces.filter(p => p > 0);
+    const avgPaceSec = allPaces.length > 0 ? allPaces.reduce((a,b)=>a+b,0)/allPaces.length : 320;
+    const bestPace = sortedPaces.length >= 3 
+      ? sortedPaces.slice(0,3).reduce((a,b)=>a+b,0)/3 
+      : (sortedPaces[0] || 280);
+  
+    // HM prediction: more conservative = avg_pace * 1.0 (you can't race HM at 5K pace!)
+    // Use weighted: 60% recent avg + 40% best pace, then add HM adjustment
+    const effectivePace = avgPaceSec * 0.6 + bestPace * 0.4;
+    // HM pace is typically ~5-10% slower than 10K pace
+    // If you can run 5K at 5:00, HM at 5:13 is reasonable
+    const halfPace = Math.max(effectivePace * 1.05, 313); // floor at 5:13
+  
+    const halfSec = halfPace * 21.1;
+    const halfStr = secToTime(halfSec);
+    document.getElementById('predictHalf').textContent = halfStr;
+    document.getElementById('predictHalfPace').textContent = fmtPace(halfPace);
+    document.getElementById('predict5k').textContent = secToTime(bestPace * 5 * 1.03);
+    document.getElementById('predict10k').textContent = secToTime(bestPace * 10 * 1.05);
+    document.getElementById('predictMarathon').textContent = secToTime(halfPace * 2 * 1.08);
 
-  // Progress chart
-  new Chart(document.getElementById('progressChart'),{
-    type:'line',
-    data:{
-      labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
-      datasets:[{
-        label:'配速 (sec/km)', data:[...ws].reverse().map(s=>s.avg_pace_sec_km),
-        borderColor:'rgba(245,182,66,0.8)', backgroundColor:'rgba(245,182,66,0.1)',
-        fill:true, tension:0.3, pointBackgroundColor:'#f5b642', pointRadius:5,
-        borderWidth:2
-      },{
-        label:'目標半馬配速 (5:13)', data:[...ws].reverse().map(()=>313),
-        borderColor:'rgba(240,101,101,0.5)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false
-      }]
-    },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>fmtPace(v) }, grid:{ color:'rgba(37,41,64,0.3)' } } } }
-  });
+    // Progress chart: show weekly avg pace + target HM pace
+    new Chart(document.getElementById('progressChart'),{
+      type:'line',
+      data:{
+        labels:[...ws].reverse().map(s=>s.week_start.slice(5)),
+        datasets:[{
+          label:'每週平均配速', data:[...ws].reverse().map(s=>s.avg_pace_sec_km),
+          borderColor:'rgba(79,140,247,0.8)', backgroundColor:'rgba(79,140,247,0.1)',
+          fill:true, tension:0.3, pointBackgroundColor:'#4f8cf7', pointRadius:5,
+          borderWidth:2
+        },{
+          label:'而家預測半馬配速', data:[...ws].reverse().map(()=>halfPace),
+          borderColor:'rgba(59,206,138,0.6)', borderDash:[6,4], pointRadius:0, borderWidth:2, fill:false
+        },{
+          label:'目標半馬配速 (5:13)', data:[...ws].reverse().map(()=>313),
+          borderColor:'rgba(245,182,66,0.6)', borderDash:[2,4], pointRadius:0, borderWidth:2, fill:false
+        }]
+      },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>fmtPace(v) }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'配速 (min/km)', color:'#7e8299', font:{size:11} } } } }
+    });
 
-  // Goal path
-  const goalPace = 313; // 5:13/km for sub-1:50
-  const currentPace = bestPace; // Using best pace for race prediction
-  const gapSec = currentPace - goalPace;
-  const gapPct = Math.round((1 - goalPace/currentPace)*100);
-  const avgPaceStr = recentAvgPace ? fmtPace(recentAvgPace) : '—';
-  document.getElementById('pathAnalysis').innerHTML = `
-    <div style="padding:16px">
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3)">
-          <span>而家配速</span><span>目標配速</span>
+    // Goal path — clear logic
+    const goalPace = 313; // 5:13/km for sub-1:50
+    const gapSec = halfPace - goalPace; // Positive = need to improve
+    const gapPct = halfPace > goalPace ? Math.round((1 - goalPace/halfPace)*100) : 0;
+    const onTrack = halfPace <= goalPace;
+    const avgPaceStr = avgPaceSec ? fmtPace(avgPaceSec) : '—';
+  
+    document.getElementById('pathAnalysis').innerHTML = `
+      <div style="padding:16px">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px">
+            <span>而家預測配速</span><span>目標配速</span>
+          </div>
+          <div class="pace-zone-bar" style="margin:4px 0 8px">
+            ${onTrack 
+              ? `<div class="pace-zone-seg zone-easy" style="width:100%">${fmtPace(halfPace)}</div>`
+              : `<div class="pace-zone-seg zone-hard" style="width:60%">${fmtPace(goalPace)}</div><div class="pace-zone-seg zone-easy" style="width:40%">${fmtPace(halfPace)}</div>`
+            }
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+            <span id="currentPredLabel">${fmtPace(halfPace)}</span>
+            <span id="targetPredLabel">${fmtPace(goalPace)}</span>
+          </div>
+          <div style="text-align:center;font-size:13px;color:var(--text2);margin-top:10px">
+            ${onTrack
+              ? '<span style="color:var(--accent2);font-weight:700">✅ 已達標！</span> 你而家預測配速已經快過目標'
+              : `需要進步 <strong style="color:var(--accent3)">${gapPct}%</strong> 配速`
+            }
+          </div>
         </div>
-        <div class="pace-zone-bar" style="margin:4px 0 8px">
-          <div class="pace-zone-seg zone-easy" style="width:${100-gapPct}%">${fmtPace(goalPace)}</div>
-          <div class="pace-zone-seg zone-hard" style="width:${gapPct}%">${fmtPace(currentPace)}</div>
-        </div>
-        <div style="text-align:center;font-size:13px;color:var(--text2)">
-          需要進步 <strong style="color:var(--accent3)">${gapPct}%</strong> 配速
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text2)">
+          <strong>📊 配速對比：</strong><br>
+          <span style="display:flex;justify-content:space-between"><span>🏆 最佳配速 (5K/10K)</span><span>${fmtPace(bestPace)}</span></span>
+          <span style="display:flex;justify-content:space-between"><span>📊 訓練平均配速</span><span>${avgPaceStr}</span></span>
+          <span style="display:flex;justify-content:space-between"><span>🎯 預測半馬配速</span><span style="color:${onTrack?'var(--accent2)':'var(--accent3)'};font-weight:700">${fmtPace(halfPace)}</span></span>
+          <span style="display:flex;justify-content:space-between"><span>🎯 目標半馬配速</span><span style="color:var(--accent);font-weight:700">5:13/km</span></span><br>
+          <strong>💡 解讀：</strong><br>
+          半馬配速唔可以用5K/10K最佳配速去估。<br>
+          你而家最快跑過 <strong>${fmtPace(bestPace)}</strong>（短距離），但半馬要維持21km。<br>
+          預測係用 <strong>訓練平均配速</strong>（${avgPaceStr}）× 半馬調整 factor。<br>
+          ${halfPace > goalPace 
+            ? `<br><strong>📅 時間表（5個月到 Dec 2026）：</strong><br>
+               • 每月配速進步目標：~${Math.round(gapPct/5)}%<br>
+               • 6-7月（Base）：每週30-45km easy，打好 aerobic base<br>
+               • 8-9月（Build）：加 tempo run (5:30-5:45/km) + 間歇跑<br>
+               • 10-11月（Peak）：race pace work + 長課 18-20km<br>
+               • 12月：Taper + 比賽`
+            : '<br><strong>🎉 你而家嘅訓練水平已經支持 sub-1:50！</strong><br>繼續保持里數，比賽前做幾次 pace work 就穩陣！'
+          }
         </div>
       </div>
-      <div style="margin-top:12px;font-size:12px;line-height:1.6;color:var(--text2)">
-        <strong>📅 時間表：</strong>5個月到 Dec 2026<br>
-        <strong>🏆 最佳配速：</strong>${fmtPace(bestPace)}（基於最近最快3次）<br>
-        <strong>📊 平均配速：</strong>${avgPaceStr}（所有訓練）<br>
-        <strong>📊 每月目標：</strong>每月配速進步 ~${Math.round(gapPct/5)}%<br>
-        <strong>🏃 關鍵訓練：</strong>Base phase 打好 aerobic base → Build phase 加 tempo/intervals → Peak phase race pace work
-      </div>
-    </div>
-  `;
+    `;
 
-  // Goal coach
-  document.getElementById('goalCoach').innerHTML = `
-    <div class="coach-advice">
-      <strong>📊 可行性分析：</strong><br>
-      VO2max 50 · 年齡 33 · 而家 10K pace ~6:17/km<br><br>
-      <strong>Sub-1:50（5:13/km）</strong> — 以你而家 fitness level 係 <strong style="color:var(--accent2)">完全可行 ✅</strong><br>
-      由 6:17/km 到 5:13/km 需要約 <strong>17%</strong> 配速進步<br>
-      5個月時間，每月只需進步 ~3.4%<br><br>
-      <strong>訓練路徑：</strong><br>
-      • 6-7月（Base）：每週30-45km，全部 easy pace，建立 aerobic base<br>
-      • 8-9月（Build）：加 tempo run (5:30-5:45/km) + 間歇跑<br>
-      • 10-11月（Peak）：race pace work + 長課 18-20km<br>
-      • 12月：Taper + 半馬比賽<br><br>
-      <strong>關鍵成功因素：</strong><br>
-      ✓ Consistent mileage（唔好跳跑）<br>
-      ✓ Gym 2x/週（防止受傷）<br>
-      ✓ 長課每週 progressive（最後5km加速）<br>
-      ✓ 充足睡眠同營養
-    </div>
-  `;
+    // Goal coach
+    const vo2max = d.vo2max || 50;
+    const age = 33;
+    document.getElementById('goalCoach').innerHTML = `
+      <div class="coach-advice">
+        <strong>📊 可行性分析：</strong><br>
+        VO2max ${vo2max} · 年齡 ${age} · 訓練平均配速 ${avgPaceStr}<br><br>
+        <strong>Sub-1:50（5:13/km）</strong> — 以你而家 fitness level 係 <strong style="color:var(--accent2)">完全可行 ✅</strong><br>
+        ${halfPace > goalPace 
+          ? `由 ${fmtPace(halfPace)} 到 5:13/km 需要約 <strong>${gapPct}%</strong> 配速進步<br>5個月時間，每月只需進步 ~${Math.round(gapPct/5)}%`
+          : `你而家預測配速 ${fmtPace(halfPace)} 已經快過目標！`
+        }<br><br>
+        <strong>訓練路徑：</strong><br>
+        • 6-7月（Base）：每週30-45km，全部 easy pace，建立 aerobic base<br>
+        • 8-9月（Build）：加 tempo run (5:30-5:45/km) + 間歇跑<br>
+        • 10-11月（Peak）：race pace work + 長課 18-20km<br>
+        • 12月：Taper + 半馬比賽<br><br>
+        <strong>關鍵成功因素：</strong><br>
+        ✓ Consistent mileage（唔好跳跑）<br>
+        ✓ Gym 2x/週（防止受傷）<br>
+        ✓ 長課每週 progressive（最後5km加速）<br>
+        ✓ 充足睡眠同營養
+      </div>
+    `;
 
   // ── TAB 5: AI Coach ──
   if (p && p.next_week_plan) {
