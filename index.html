@@ -461,11 +461,11 @@
       <div class="chart-container"><canvas id="progressChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">📊 達標路徑</div>
-      <div id="pathAnalysis" style="font-size:13px;line-height:1.7;color:var(--text2)">
-        <div style="padding:16px;text-align:center;color:var(--text3)">載入中...</div>
-      </div>
-    </div>
+          <div class="card-title">🎯 目標階梯</div>
+          <div id="pathAnalysis" style="padding:12px">
+            <div style="text-align:center;padding:16px;color:var(--text3)">載入中...</div>
+          </div>
+        </div>
   </div>
 
   <div class="card coach-card" style="margin-top:14px">
@@ -841,6 +841,120 @@
   }
   .form-data-table td:nth-child(2) { font-weight: 500; }
   .form-data-table td:first-child { font-size: 11px; color: var(--text3); }
+</style>
+
+<style>
+  /* ── Goal Ladder ── */
+  .goal-ladder {
+    position: relative;
+    min-height: 100px;
+    margin: 0 0 12px;
+  }
+  .ladder-connector {
+    position: absolute;
+    top: 28px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--red), var(--accent3), var(--accent2), var(--accent), var(--purple));
+    border-radius: 2px;
+    z-index: 0;
+  }
+  .ladder-step {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    transition: margin-left 0.5s ease;
+    margin-left: 10%; /* default fallback */
+  }
+  .ladder-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: transform 0.2s;
+  }
+  .ladder-dot:hover { transform: translateY(-3px) scale(1.05); }
+  .ladder-icon {
+    width: 32px; height: 32px;
+    background: var(--surface2);
+    border: 2px solid var(--border2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+  }
+  .ladder-step.current .ladder-icon {
+    background: var(--surface);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(79,140,247,0.3);
+  }
+  .ladder-step.target .ladder-icon {
+    background: linear-gradient(135deg, rgba(245,182,66,0.2), rgba(240,101,101,0.2));
+    border-color: var(--accent3);
+    box-shadow: 0 0 12px rgba(245,182,66,0.2);
+  }
+  .ladder-step.target.ontrack .ladder-icon {
+    background: linear-gradient(135deg, rgba(59,206,138,0.2), rgba(79,140,247,0.2));
+    border-color: var(--accent2);
+    box-shadow: 0 0 12px rgba(59,206,138,0.2);
+  }
+  .ladder-pace {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--text);
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .ladder-step.target .ladder-pace { color: var(--accent3); }
+  .ladder-step.current .ladder-pace { color: var(--accent); }
+  .ladder-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text3);
+    font-weight: 600;
+  }
+
+  /* Summary below ladder */
+  .ladder-summary {
+    margin-top: 100px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+  }
+  .ladder-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid rgba(37,41,64,0.3);
+  }
+  .ladder-row span:last-child { font-weight: 600; font-family: var(--mono); }
+  .ladder-row.goal {
+    font-weight: 700;
+    color: var(--text);
+    border: none;
+  }
+  .ladder-row.goal span:last-child { color: var(--accent); font-size: 13px; }
+  .ladder-gap {
+    text-align: center;
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(245,182,66,0.08);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .ladder-gap strong { color: var(--accent3); }
+
+  @media (max-width:640px) {
+    .ladder-pace { font-size: 10px; }
+    .ladder-icon { width: 26px; height: 26px; font-size: 11px; }
+    .ladder-label { font-size: 7px; }
+  }
 </style>
 <div class="tab-content" id="tab-coach">
   <div class="card coach-card">
@@ -2116,58 +2230,73 @@ function render() {
       options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ labels:{ color:'#7e8299', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#7e8299', font:{size:11} }, grid:{ color:'rgba(37,41,64,0.3)' } }, y:{ reverse:true, ticks:{ color:'#7e8299', font:{size:11}, callback:v=>fmtPace(v) }, grid:{ color:'rgba(37,41,64,0.3)' }, title:{ display:true, text:'配速 (min/km)', color:'#7e8299', font:{size:11} } } } }
     });
 
-    // Goal path — clear logic
-    const goalPace = 313; // 5:13/km for sub-1:50
-    const gapSec = halfPace - goalPace; // Positive = need to improve
-    const gapPct = halfPace > goalPace ? Math.round((1 - goalPace/halfPace)*100) : 0;
-    const onTrack = halfPace <= goalPace;
-    const avgPaceStr = avgPaceSec ? fmtPace(avgPaceSec) : '—';
-  
-    document.getElementById('pathAnalysis').innerHTML = `
-      <div style="padding:16px">
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:4px">
-            <span>而家預測配速</span><span>目標配速</span>
+    // Goal ladder — clear visual progression path
+        const goalPace = 313; // 5:13/km for sub-1:50
+        const gapSec = halfPace - goalPace; // Positive = need to improve
+        const gapPct = halfPace > goalPace ? Math.round((1 - goalPace/halfPace)*100) : 0;
+        const onTrack = halfPace <= goalPace;
+        const avgPaceStr = avgPaceSec ? fmtPace(avgPaceSec) : '—';
+    
+        // Build ladder steps: 4 equally-spaced milestones from current → goal
+        const milestones = [];
+        for (let i = 0; i <= 4; i++) {
+          const fractionalPace = halfPace + (goalPace - halfPace) * (i / 4);
+          const month = 7 + i; // Jul → Aug → Sep → Oct → Nov
+          milestones.push({
+            month: month > 12 ? month - 12 : month,
+            monthName: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][(month-1)%12],
+            pace: fractionalPace,
+            label: i === 0 ? '而家預測' : i === 4 ? '🎯 目標' : `月${i}`,
+            isActive: i === 0,
+            isTarget: i === 4
+          });
+        }
+    
+        document.getElementById('pathAnalysis').innerHTML = `
+          <div class="goal-ladder">
+            ${milestones.map((m, i) => {
+              // Position: 0% (current slowest) to 100% (goal fastest)
+              // Pace: halfPace (slow) → goalPace (fast)
+              const range = halfPace - goalPace;
+              const pos = range > 0 ? ((halfPace - m.pace) / range * 80 + 10) : 10;
+              return `
+                <div class="ladder-step ${i === 0 ? 'current' : ''} ${i === 4 ? 'target' : ''}"
+                     style="margin-left:${pos}%">
+                  <div class="ladder-dot ${i === 0 ? 'current' : ''} ${i === 4 ? 'target' : ''} ${onTrack ? 'ontrack' : ''}">
+                    <div class="ladder-icon">${i === 0 ? '📍' : i === 4 ? (onTrack ? '🏆' : '🏁') : '🏃'}</div>
+                    <div class="ladder-pace">${fmtPace(m.pace)}</div>
+                    <div class="ladder-label">${m.monthName}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+            <div class="ladder-connector"></div>
           </div>
-          <div class="pace-zone-bar" style="margin:4px 0 8px">
-            ${onTrack 
-              ? `<div class="pace-zone-seg zone-easy" style="width:100%">${fmtPace(halfPace)}</div>`
-              : `<div class="pace-zone-seg zone-hard" style="width:60%">${fmtPace(goalPace)}</div><div class="pace-zone-seg zone-easy" style="width:40%">${fmtPace(halfPace)}</div>`
-            }
+          <div class="ladder-summary">
+            <div class="ladder-row">
+              <span>🏆 最佳配速</span>
+              <span>${fmtPace(bestPace)}</span>
+            </div>
+            <div class="ladder-row">
+              <span>📊 訓練平均</span>
+              <span>${avgPaceStr}</span>
+            </div>
+            <div class="ladder-row">
+              <span>🎯 預測半馬</span>
+              <span>${fmtPace(halfPace)}</span>
+            </div>
+            <div class="ladder-row goal">
+              <span>🎯 目標半馬</span>
+              <span>5:13/km</span>
+            </div>
+            <div class="ladder-gap">
+              ${onTrack
+                ? '✅ 已達標！'
+                : `差距 <strong>${Math.round((halfPace - goalPace)/60*100)/100}min/km</strong> · 需進步 <strong>${gapPct}%</strong>`
+              }
+            </div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
-            <span id="currentPredLabel">${fmtPace(halfPace)}</span>
-            <span id="targetPredLabel">${fmtPace(goalPace)}</span>
-          </div>
-          <div style="text-align:center;font-size:13px;color:var(--text2);margin-top:10px">
-            ${onTrack
-              ? '<span style="color:var(--accent2);font-weight:700">✅ 已達標！</span> 你而家預測配速已經快過目標'
-              : `需要進步 <strong style="color:var(--accent3)">${gapPct}%</strong> 配速`
-            }
-          </div>
-        </div>
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;line-height:1.6;color:var(--text2)">
-          <strong>📊 配速對比：</strong><br>
-          <span style="display:flex;justify-content:space-between"><span>🏆 最佳配速 (5K/10K)</span><span>${fmtPace(bestPace)}</span></span>
-          <span style="display:flex;justify-content:space-between"><span>📊 訓練平均配速</span><span>${avgPaceStr}</span></span>
-          <span style="display:flex;justify-content:space-between"><span>🎯 預測半馬配速</span><span style="color:${onTrack?'var(--accent2)':'var(--accent3)'};font-weight:700">${fmtPace(halfPace)}</span></span>
-          <span style="display:flex;justify-content:space-between"><span>🎯 目標半馬配速</span><span style="color:var(--accent);font-weight:700">5:13/km</span></span><br>
-          <strong>💡 解讀：</strong><br>
-          半馬配速唔可以用5K/10K最佳配速去估。<br>
-          你而家最快跑過 <strong>${fmtPace(bestPace)}</strong>（短距離），但半馬要維持21km。<br>
-          預測係用 <strong>訓練平均配速</strong>（${avgPaceStr}）× 半馬調整 factor。<br>
-          ${halfPace > goalPace 
-            ? `<br><strong>📅 時間表（5個月到 Dec 2026）：</strong><br>
-               • 每月配速進步目標：~${Math.round(gapPct/5)}%<br>
-               • 6-7月（Base）：每週30-45km easy，打好 aerobic base<br>
-               • 8-9月（Build）：加 tempo run (5:30-5:45/km) + 間歇跑<br>
-               • 10-11月（Peak）：race pace work + 長課 18-20km<br>
-               • 12月：Taper + 比賽`
-            : '<br><strong>🎉 你而家嘅訓練水平已經支持 sub-1:50！</strong><br>繼續保持里數，比賽前做幾次 pace work 就穩陣！'
-          }
-        </div>
-      </div>
-    `;
+        `;
 
     // Goal coach
     const vo2max = d.vo2max || 50;
