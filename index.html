@@ -3928,9 +3928,8 @@ function showActivity(idx) {
   }
   
   if (a.avg_hr) {
-    const min = a.min_hr ? `${a.min_hr}` : '—';
-    const max = a.max_hr ? `${a.max_hr}` : '—';
-    coreItems.push({ lbl:'❤️ 心率範圍', val:`${min} – ${a.avg_hr} – ${max} bpm` });
+    const max = a.max_hr ? ` / ${a.max_hr}` : '';
+    coreItems.push({ lbl:'❤️ 心率', val:`${a.avg_hr}${max} bpm`, cls:'highlight' });
     coreItems.push({ lbl:'📊 心率區間', val:a.hr_zone_avg_name||'—' });
   }
   
