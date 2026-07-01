@@ -1275,7 +1275,7 @@ function render() {
 
   // ── TAB 3: Analytics ──
   // Calc averages
-  const runActs = all.filter(a=>'run' in a.type);
+  const runActs = all.filter(a=>a.type.includes('run'));
   const paces = runActs.filter(a=>a.pace_sec_km).map(a=>a.pace_sec_km);
   const avgPace = paces.length>0 ? paces.reduce((a,b)=>a+b,0)/paces.length : null;
   document.getElementById('avgPace').textContent = avgPace ? fmtPace(avgPace) : '—';
@@ -1505,8 +1505,14 @@ function showActivity(idx) {
   modal.classList.add('open');
 }
 
-// ── Render immediately ──
-render();
+// ── Render ──
+window.onload = function() {
+  try {
+    render();
+  } catch(e) {
+    document.body.innerHTML += '<div style="color:red;padding:20px">Error: '+e.message+'</div>';
+  }
+};
 </script>
 </body>
 </html>
