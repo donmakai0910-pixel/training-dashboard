@@ -210,13 +210,50 @@
     padding: 4px 8px; border-radius: 6px;
   }
   .modal-close:hover { background: var(--surface2); color: var(--text); }
-  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .modal-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px; }
-  .modal-item .lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
-  .modal-item .val { font-size: 16px; font-weight: 700; margin-top: 4px; }
-  .modal-item .val .s { font-size: 11px; font-weight: 400; color: var(--text3); }
-  .modal-coach { padding: 14px; background: rgba(79,140,247,0.06); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); font-size: 13px; line-height: 1.6; color: var(--text2); }
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .modal-section { margin-bottom: 18px; }
+  .modal-section:last-child { margin-bottom: 0; }
+  .modal-section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text3); margin-bottom: 10px;
+    padding-bottom: 6px; border-bottom: 1px solid rgba(37,41,64,0.4);
+  }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0; }
+  .modal-grid.tech { grid-template-columns: 1fr 1fr; }
+  .modal-item {
+    background: var(--surface2); border-radius: var(--radius-sm); padding: 12px;
+    transition: transform 0.15s;
+  }
+  .modal-item:hover { transform: translateY(-1px); }
+  .modal-item .lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .modal-item .val { font-size: 16px; font-weight: 700; margin-top: 2px; font-family: var(--mono); }
+  .modal-item.highlight {
+    background: linear-gradient(135deg, rgba(79,140,247,0.12), rgba(245,182,66,0.08));
+    border: 1px solid rgba(79,140,247,0.15);
+  }
+  .modal-item.highlight .val { color: var(--accent); }
+  .modal-item .desc { font-size: 10px; color: var(--text3); margin-top: 4px; line-height: 1.3; }
+  .modal-coach {
+    padding: 14px; background: linear-gradient(135deg, rgba(79,140,247,0.08), rgba(59,206,138,0.04));
+    border-radius: var(--radius-sm); border-left: 3px solid var(--accent);
+    font-size: 13px; line-height: 1.6; color: var(--text2);
+  }
+
+  /* HR Zone mini bar inside modal */
+  .hr-zone-bar {
+    display: flex; height: 28px; border-radius: 6px; overflow: hidden; margin: 6px 0;
+  }
+  .hr-zone-seg {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 600; color: rgba(255,255,255,0.85);
+    transition: flex 0.3s; min-width: 4px;
+  }
+  .hr-zone-seg:hover { opacity: 0.85; }
+  .hr-zone-label { text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+  .hr-zone-legend { display: flex; gap: 12px; margin: 6px 0; flex-wrap: wrap; }
+  .hr-zone-legend-item { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--text3); text-transform: uppercase; }
+  .hr-zone-legend-item span { width: 8px; height: 8px; border-radius: 2px; }
+  .hr-zone-total { font-size: 10px; color: var(--text3); font-weight: 600; }
 
   /* ── Week table ── */
   .week-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -3837,28 +3874,145 @@ function showActivity(idx) {
   
   document.getElementById('modalTitle').textContent = `${ICONS[a.type]||'🏃'} ${a.name||TNAMES[a.type]||'活動'}`;
   
-  const items = [
-    { lbl:'日期', val:a.date },
-    { lbl:'類型', val:TNAMES[a.type]||a.type },
-    { lbl:'距離', val:a.distance_km>0?a.distance_km+'<span class="s"> km</span>':'—' },
-    { lbl:'時間', val:a.duration_min+'<span class="s"> min</span>' },
-    { lbl:'配速', val:a.pace_sec_km?fmtPace(a.pace_sec_km):'—' },
-    { lbl:'心率', val:a.avg_hr?a.avg_hr+'<span class="s"> bpm</span>':'—' },
-    { lbl:'卡路里', val:a.calories?a.calories+'<span class="s"> kcal</span>':'—' },
-    { lbl:'心率區間', val:a.hr_zone_avg_name||'—' },
-  ];
-  document.getElementById('modalGrid').innerHTML = items.map(i=>`<div class="modal-item"><div class="lbl">${i.lbl}</div><div class="val">${i.val}</div></div>`).join('');
+  const isRun = a.type && a.type.includes('run');
   
-  // AI Coach analysis for this activity
+  // ── Core metrics (always show) ──
+  const coreItems = [];
+  coreItems.push({ lbl:'📅 日期', val:a.date });
+  coreItems.push({ lbl:'🏷️ 類型', val:TNAMES[a.type]||a.type });
+  coreItems.push({ lbl:'⏱️ 時間', val:a.duration_min ? `${Math.floor(a.duration_min/60)}h ${Math.round(a.duration_min%60)}m` : '—' });
+  
+  if (a.distance_km > 0) {
+    coreItems.push({ lbl:'📏 距離', val:`${a.distance_km} km` });
+    if (a.pace_sec_km) coreItems.push({ lbl:'⚡ 配速', val:fmtPace(a.pace_sec_km), cls:'highlight' });
+  }
+  
+  if (a.avg_hr) {
+    coreItems.push({ lbl:'❤️ 平均心率', val:`${a.avg_hr} bpm` });
+    if (a.max_hr) coreItems.push({ lbl:'❤️‍🔥 最高心率', val:`${a.max_hr} bpm` });
+    coreItems.push({ lbl:'📊 心率區間', val:a.hr_zone_avg_name||'—' });
+  }
+  
+  if (a.calories) coreItems.push({ lbl:'🔥 卡路里', val:`${a.calories} kcal` });
+  if (a.elevation_gain_m > 0) coreItems.push({ lbl:'⛰️ 爬升', val:`${a.elevation_gain_m} m` });
+  
+  // ── Running form metrics (technical details) ──
+  const formItems = [];
+  if (isRun) {
+    if (a.avg_cadence) formItems.push({ lbl:'🦶 步頻', val:`${a.avg_cadence} spm`, desc:'180 spm 係理想 cadence' });
+    if (a.avg_stride_length_cm) formItems.push({ lbl:'📐 步幅', val:`${a.avg_stride_length_cm} cm`, desc:`∼${(a.avg_stride_length_cm/100).toFixed(2)}m` });
+    if (a.avg_ground_contact_ms) {
+      const gctColor = a.avg_ground_contact_ms < 240 ? 'var(--accent2)' : a.avg_ground_contact_ms < 270 ? 'var(--accent3)' : 'var(--red)';
+      formItems.push({ lbl:'👟 觸地時間', val:`<span style="color:${gctColor}">${a.avg_ground_contact_ms} ms</span>`, desc:'<240 優秀 · 240-270 正常 · >270 需要改善' });
+    }
+    if (a.avg_vertical_oscillation_cm) {
+      const voColor = a.avg_vertical_oscillation_cm < 7 ? 'var(--accent2)' : a.avg_vertical_oscillation_cm < 9 ? 'var(--accent3)' : 'var(--red)';
+      formItems.push({ lbl:'📈 垂直振幅', val:`<span style="color:${voColor}">${a.avg_vertical_oscillation_cm} cm</span>`, desc:'<7 優秀 · 7-9 正常 · >9 太大（浪費能量）' });
+    }
+    if (a.avg_vertical_ratio) {
+      const vrColor = a.avg_vertical_ratio < 7 ? 'var(--accent2)' : a.avg_vertical_ratio < 9 ? 'var(--accent3)' : 'var(--red)';
+      formItems.push({ lbl:'📊 垂直比率', val:`<span style="color:${vrColor}">${a.avg_vertical_ratio}%</span>`, desc:'<7% 高效 · 7-9% 正常 · >9% 需改善' });
+    }
+    if (a.avg_speed_kmh) formItems.push({ lbl:'🚀 平均速度', val:`${a.avg_speed_kmh} km/h` });
+    if (a.max_speed_kmh) formItems.push({ lbl:'💨 最高速度', val:`${a.max_speed_kmh} km/h` });
+  }
+  
+  // ── Training effect ──
+  const teItems = [];
+  if (a.training_effect !== null && a.training_effect !== undefined) {
+    const teColor = a.training_effect < 2 ? 'var(--text3)' : a.training_effect < 3 ? 'var(--accent2)' : a.training_effect < 4 ? 'var(--accent3)' : 'var(--red)';
+    teItems.push({ lbl:'🎯 訓練效果', val:`<span style="color:${teColor}">${a.training_effect.toFixed(1)}</span>`, desc:'1-2 恢復 · 2-3 維持 · 3-4 提升 · 4-5 高強度' });
+  }
+  if (a.aerobic_effect !== null && a.aerobic_effect !== undefined) {
+    teItems.push({ lbl:'🫁 有氧效果', val:`${a.aerobic_effect.toFixed(1)}`, desc:a.aerobic_label||'' });
+  }
+  if (a.anaerobic_effect !== null && a.anaerobic_effect !== undefined) {
+    teItems.push({ lbl:'💪 無氧效果', val:`${a.anaerobic_effect.toFixed(1)}` });
+  }
+  if (a.training_load !== null && a.training_load !== undefined) {
+    teItems.push({ lbl:'📊 訓練負荷', val:`${a.training_load}` });
+  }
+  
+  // ── HR zone breakdown (mini bar chart) ──
+  let hrZoneHTML = '';
+  if (a.hr_zones && a.hr_zones.some(z => z > 0)) {
+    const total = a.hr_zones.reduce((s,v) => s+v, 0);
+    const zoneLabels = ['Z1','Z2','Z3','Z4','Z5'];
+    const zoneColors = ['rgba(79,140,247,0.6)','rgba(59,206,138,0.6)','rgba(245,182,66,0.6)','rgba(240,101,101,0.6)','rgba(139,108,247,0.6)'];
+    hrZoneHTML = `
+      <div class="modal-section">
+        <div class="modal-section-title">❤️ 心率區間時間</div>
+        <div class="hr-zone-bar">
+          ${a.hr_zones.map((z, i) => z > 0.1 ? `
+            <div class="hr-zone-seg" style="flex:${z};background:${zoneColors[i]};min-width:4px" title="${zoneLabels[i]}: ${z}min">
+              <span class="hr-zone-label">${z.toFixed(1)}</span>
+            </div>
+          ` : '').join('')}
+        </div>
+        <div class="hr-zone-legend">
+          ${zoneLabels.map((l, i) => `<span class="hr-zone-legend-item"><span style="background:${zoneColors[i].replace('0.6','1')}"></span>${l}</span>`).join('')}
+        </div>
+        ${total > 0 ? `<div class="hr-zone-total">總時間 ${total.toFixed(1)}min</div>` : ''}
+      </div>
+    `;
+  }
+  
+  // ── Assemble modal ──
+  const formHTML = formItems.length > 0 ? `
+    <div class="modal-section">
+      <div class="modal-section-title">🔬 跑姿分析</div>
+      <div class="modal-grid tech">${formItems.map(i => `
+        <div class="modal-item">
+          <div class="lbl">${i.lbl}</div>
+          <div class="val">${i.val}</div>
+          <div class="desc">${i.desc||''}</div>
+        </div>
+      `).join('')}</div>
+    </div>
+  ` : '';
+  
+  const teHTML = teItems.length > 0 ? `
+    <div class="modal-section">
+      <div class="modal-section-title">🎯 訓練效果</div>
+      <div class="modal-grid">${teItems.map(i => `
+        <div class="modal-item">
+          <div class="lbl">${i.lbl}</div>
+          <div class="val">${i.val}</div>
+          <div class="desc">${i.desc||''}</div>
+        </div>
+      `).join('')}</div>
+    </div>
+  ` : '';
+  
+  document.getElementById('modalGrid').innerHTML = `
+    <div class="modal-section">
+      <div class="modal-section-title">📋 基本資訊</div>
+      <div class="modal-grid core">${coreItems.map(i => `
+        <div class="modal-item${i.cls?' '+i.cls:''}">
+          <div class="lbl">${i.lbl}</div>
+          <div class="val">${i.val}</div>
+        </div>
+      `).join('')}</div>
+    </div>
+    ${formHTML}
+    ${hrZoneHTML}
+    ${teHTML}
+  `;
+  
+  // AI Coach analysis
   let coachMsg = '';
   if (a.type==='strength_training') {
     coachMsg = '💪 Gym session — 肌力訓練對跑步好重要，尤其係核心同腳部力量。每週至少2次，可以預防受傷。';
-  } else if (a.pace_sec_km) {
+  } else if (a.pace_sec_km && isRun) {
     const paceMin = a.pace_sec_km/60;
     if (paceMin < 5) coachMsg = `⚡ 快跑！${fmtPace(a.pace_sec_km)} 配速接近閾值區，呢個係高強度訓練。注意 recovery。`;
     else if (paceMin < 6) coachMsg = `🏃 Tempo 區配速（${fmtPace(a.pace_sec_km)}），好好嘅節奏跑，有助提升乳酸閾值。`;
     else if (paceMin < 7.5) coachMsg = `🌱 Easy run（${fmtPace(a.pace_sec_km)}），正確嘅有氧配速。Base phase 最緊要係 keep 住呢個 zone。`;
     else coachMsg = `🐢 Recovery pace（${fmtPace(a.pace_sec_km)}），適合 recovery day 或者熱身。`;
+    
+    if (a.avg_ground_contact_ms && a.avg_ground_contact_ms > 270) coachMsg += ' ⚠️ 觸地時間偏高，建議 focus 喺 cadence 提升。';
+    if (a.avg_vertical_oscillation_cm && a.avg_vertical_oscillation_cm > 9) coachMsg += ' ⚠️ 垂直振幅偏大，浪費能量，試下 core 穩定同 step rate 改善。';
+    if (a.avg_cadence && a.avg_cadence < 160) coachMsg += ' ⚠️ 步頻偏低（<160），建議跑快手時提高 cadence 到 170+。';
   }
   if (a.calories > 800) coachMsg += ' 🔥 高卡路里消耗，證明訓練量充足。';
   document.getElementById('modalCoach').innerHTML = '🤖 ' + (coachMsg || '繼續保持！每個訓練都係進步嘅一部分。');
