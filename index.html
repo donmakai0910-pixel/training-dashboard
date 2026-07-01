@@ -1505,9 +1505,8 @@ function showActivity(idx) {
   modal.classList.add('open');
 }
 
-document.addEventListener('DOMContentLoaded', render);
-// Also call immediately in case DOMContentLoaded already fired
-if (document.readyState !== 'loading') render();
+// ── Render immediately ──
+render();
 </script>
 </body>
 </html>
