@@ -1,4 +1,0 @@
-include:
-  - "*.html"
-  - "*.json"
-  - ".nojekyll"
