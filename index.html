@@ -200723,7 +200723,7 @@ function showActivity(idx) {
               paceData = paceData.filter((_, i) => i % step === 0);
             }
           }
-          const hasPace = paceData.length > 10;
+          const hasPace = paceData.length >= 3;
       
           hrChartHTML = `
             <div class="modal-section">
