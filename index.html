@@ -200457,8 +200457,7 @@ function render() {
     document.getElementById('cGym').textContent = n.gym_sessions;
     document.getElementById('cLong').textContent = n.long_run;
     document.getElementById('coachAdvice').innerHTML = `
-      <strong>📝 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}
-    `;
+          <strong>📝 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}`;
     document.getElementById('coachSchedule').innerHTML = `📅 ${Array.isArray(n.weekly_schedule) ? n.weekly_schedule.map(s => `${s.day}: ${s.detail}`).join('<br>') : (n.weekly_schedule || '未有行程')}`;
   }
 
@@ -200883,16 +200882,45 @@ function showActivity(idx) {
   
   modal.classList.add('open');
   
-    // ── Initialize HR + Pace charts using pre-built chartsJS ──
-    if (chartsJS) {
-      // Destroy old charts if modal was previously opened
-      const oldCharts = ['hrChart_' + idx, 'paceChart_' + idx];
-      oldCharts.forEach(id => {
-        const c = document.getElementById(id);
-        if (c) { const ch = Chart.getChart(c); if (ch) ch.destroy(); }
-      });
-      eval(chartsJS);
-    }
+    // ── Initialize HR + Pace charts directly ──
+      if (a.hr_timeseries && a.hr_timeseries.length > 10) {
+        // Destroy old charts
+        ['hrChart_' + idx, 'paceChart_' + idx].forEach(id => {
+          const c = document.getElementById(id);
+          if (c) { const ch = Chart.getChart(c); if (ch) ch.destroy(); }
+        });
+    
+        // HR chart
+        const hts = a.hr_timeseries;
+        const hStart = hts[0][0];
+        const hLabels = hts.map(p => ((p[0] - hStart) / 1000 / 60).toFixed(1));
+        const hData = hts.map(p => p[1]);
+        const maxHr = a.max_hr || Math.max(...hData);
+        let sHl = hLabels, sHd = hData;
+        if (hData.length > 500) { const st = Math.ceil(hData.length / 500); sHl = hLabels.filter((_,i) => i % st === 0); sHd = hData.filter((_,i) => i % st === 0); }
+        new Chart(document.getElementById('hrChart_' + idx), {
+          type: 'line',
+          data: { labels: sHl, datasets: [{ label: '心率 (bpm)', data: sHd, borderColor: '#f06565', backgroundColor: 'rgba(240,101,101,0.1)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2 }] },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7e8299', font: { size: 10 } } } }, scales: { x: { title: { display: true, text: '分鐘', color: '#7e8299', font: { size: 9 } }, ticks: { color: '#7e8299', font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: 'rgba(37,41,64,0.3)' } }, y: { min: Math.min(...hData) - 10, max: maxHr + 5, ticks: { color: '#7e8299', font: { size: 9 } }, grid: { color: 'rgba(37,41,64,0.3)' } } } }
+        });
+    
+        // Pace chart (km splits)
+        const ppts = a.pace_timeseries || [];
+        if (ppts.length >= 3) {
+          const pStart = ppts[0][0];
+          const pLabels = ppts.map(p => ((p[0] - pStart) / 1000 / 60).toFixed(1));
+          const pData = ppts.map(p => p[1] / 60); // sec/km -> min/km
+          const avgPace = (a.pace_sec_km || 477) / 60;
+          new Chart(document.getElementById('paceChart_' + idx), {
+            type: 'line',
+            data: { labels: pLabels, datasets: [
+              { label: '配速 (min/km)', data: pData, borderColor: '#4f8cf7', backgroundColor: 'rgba(79,140,247,0.1)', fill: true, tension: 0.1, pointRadius: 6, pointBackgroundColor: '#4f8cf7', borderWidth: 2 },
+              { label: '平均 ' + fmtPace(a.pace_sec_km || 477), data: pLabels.map(() => avgPace), borderColor: '#f5b642', borderDash: [6, 4], pointRadius: 0, borderWidth: 1.5, fill: false }
+            ] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7e8299', font: { size: 10 } } } }, scales: { x: { title: { display: true, text: '分鐘', color: '#7e8299', font: { size: 9 } }, ticks: { color: '#7e8299', font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: 'rgba(37,41,64,0.3)' } }, y: { reverse: true, ticks: { color: '#7e8299', font: { size: 9 }, callback: v => { const m = Math.floor(v); const s = Math.round((v-m)*60); return m+':'+s.toString().padStart(2,'0'); } }, grid: { color: 'rgba(37,41,64,0.3)' } } } }
+          });
+        }
+      }
   }
 
 // ── Render ──
