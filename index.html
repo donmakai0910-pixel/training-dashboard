@@ -200779,7 +200779,7 @@ function showActivity(idx) {
           // Pace data
           const pts = a.pace_timeseries || [];
           let paceLabels = [], paceData = [];
-          if (pts.length > 10) {
+          if (pts.length >= 3) {
             const pStart = pts[0][0];
             paceLabels = pts.map(p => ((p[0] - pStart) / 1000 / 60).toFixed(1));
             paceData = pts.map(p => p[1]);  // sec/km
