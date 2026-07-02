@@ -200459,7 +200459,7 @@ function render() {
     document.getElementById('coachAdvice').innerHTML = `
       <strong>📝 分析：</strong>${n.ai_reasoning || '根據上週表現調整'}
     `;
-    document.getElementById('coachSchedule').innerHTML = `📅 ${n.weekly_schedule || '未有行程'}`;
+    document.getElementById('coachSchedule').innerHTML = `📅 ${Array.isArray(n.weekly_schedule) ? n.weekly_schedule.map(s => `${s.day}: ${s.detail}`).join('<br>') : (n.weekly_schedule || '未有行程')}`;
   }
 
   // Weekly breakdown
