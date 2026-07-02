@@ -200023,17 +200023,83 @@ const INLINE_DATA = {
   }
 };
 const INLINE_PLAN = {
-  "generated_at": "2026-07-01",
+  "generated_at": "2026-07-02",
+  "phase": "base",
+  "week_start": "2026-06-29",
+  "week_end": "2026-07-05",
+  "next_week_start": "2026-07-06",
+  "next_week_end": "2026-07-12",
   "next_week_plan": {
     "run_km": 35,
-    "gym_sessions": 2,
-    "long_run": 16,
-    "focus": "重建 consistency：3 runs + 2 gym，gym 係本週首要目標（連續兩週 0 次），長課減速做 aerobic base",
-    "ai_reasoning": "上週完成率55%（24.6km/35km target），仍低於60%但比前兩週（22%/14%）已有進步。趨勢顯示從谷底回升中（14%→22%→85%→55%），55%係兩次跑課（而非三次）嘅結果，每次平均12.3km其實唔錯。長課15.6km @ 4:49/km 太快 — 呢個係 tempo pace 而唔係 long run pace，base phase 長課應該係 5:30-6:00/km。Gym 連續兩週 0 次係最大問題，必須優先處理。建議 keep 35km target（唔再加），重點係由 2 runs → 3 runs、由 0 gym → 2 gym。如果做到 3 runs + 2 gym，下週就可以考慮加返去 38-40km。仲有5個月到Dec半馬，Base Phase 最緊要係 consistent 而唔係衝里數。",
-    "weekly_schedule": "週一: Gym 全身肌力 · 週二: 8km easy run (5:40-6:00/km) · 週四: 9km easy run (5:30-5:50/km) · 週五: Gym 肌力訓練 · 週六/日: 長課 16km (pace 5:40-6:10/km, conversational pace)"
+    "gym_sessions": 1,
+    "long_run_km": 12,
+    "focus": "consistency",
+    "ai_reasoning": "Last 4 weeks avg 17km/week (37% of target 45km). Gym 1 session in 12 weeks. Base phase priority is building consistent routine, not peak volume. Reducing target from 45→35km and gym 2→1x to create achievable goals. Once 3+ consecutive weeks at >75% completion, will increase. This week is already 0km so far (Thu) — urgent need to get 3 runs in the remaining 3 days.",
+    "weekly_schedule": [
+      {
+        "day": "Friday (Jul 3)",
+        "type": "easy_run",
+        "detail": "Easy 8km @ 7:30-8:00/km treadmill, conversational pace"
+      },
+      {
+        "day": "Saturday (Jul 4)",
+        "type": "long_run",
+        "detail": "Progressive 12km treadmill: 6km easy (7:30), 4km steady (7:00), 2km cool (7:30)"
+      },
+      {
+        "day": "Sunday (Jul 5)",
+        "type": "rest",
+        "detail": "Active recovery: walk 30min or light stretching"
+      },
+      {
+        "day": "Monday (Jul 6)",
+        "type": "gym",
+        "detail": "Gym: Goblet squat 3x12, RDL 3x10, walking lunge 3x10/leg, calf raise 3x15, plank 3x45s"
+      },
+      {
+        "day": "Tuesday (Jul 7)",
+        "type": "easy_run",
+        "detail": "Easy 10km @ 7:30-8:00/km outdoor or treadmill"
+      },
+      {
+        "day": "Wednesday (Jul 8)",
+        "type": "rest",
+        "detail": "Rest or swim 30min cross-training"
+      },
+      {
+        "day": "Thursday (Jul 9)",
+        "type": "tempo_run",
+        "detail": "Tempo 7km: 2km easy warmup, 3km @ 6:30-6:45/km, 2km cool down"
+      },
+      {
+        "day": "Friday (Jul 10)",
+        "type": "rest",
+        "detail": "Active recovery"
+      },
+      {
+        "day": "Saturday (Jul 11)",
+        "type": "long_run",
+        "detail": "Progressive 12km: start 7:30, finish 6:45/km"
+      },
+      {
+        "day": "Sunday (Jul 12)",
+        "type": "gym_or_rest",
+        "detail": "Optional gym session or full rest"
+      }
+    ]
   },
-  "phase": "base",
-  "notes": "上週長課15.6km @ 4:49/km 其實太快 — 呢個配速接近你10K比賽pace，用嚟做 long run 會增加受傷風險同 recovery 負擔。Base phase 嘅 long run 應該係 easy/conversational pace (5:30-6:10/km)，目的係 build aerobic engine 而唔係練速度。另外 treadmill 跑快咗好常見（跑步機 assist），戶外跑返同樣 pace 會感覺到明顯分別。本週最大目標唔係加里數，而係：1) 跑返3次（唔係2次）2) 做返 gym（連續兩週skip咗）3) 長課減速。做到呢三樣就已經係一個 successful week。"
+  "last_week_completion": {
+    "run_km": 19.6,
+    "run_pct": 44,
+    "gym_sessions": 0,
+    "gym_pct": 0
+  },
+  "trend_4_weeks": {
+    "avg_weekly_km": 16.8,
+    "avg_gym_sessions": 0.25,
+    "run_trend": "slightly_improving_but_inconsistent",
+    "gym_trend": "neglected"
+  }
 };
 
 // ── Helpers ──
