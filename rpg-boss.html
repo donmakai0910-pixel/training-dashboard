@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐉 半馬 Boss 戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090e;
+    --surface: #11131e;
+    --surface2: #191c2c;
+    --surface3: #22263b;
+    --border: #252940;
+    --border2: #30344e;
+    --text: #e8ebf2;
+    --text2: #7e8299;
+    --text3: #535770;
+    --accent: #4f8cf7;
+    --accent2: #3bce8a;
+    --accent3: #f5b642;
+    --red: #f06565;
+    --red2: #ff4757;
+    --purple: #8b6cf7;
+    --pink: #f06bc0;
+    --orange: #ff8c42;
+    --cyan: #3bd4e0;
+    --gold: #ffd700;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ═══════ HERO BANNER ═══════ */
+  .boss-hero {
+    position: relative;
+    border-radius: var(--radius);
+    padding: 36px 28px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(79,140,247,0.08), rgba(139,108,247,0.12), rgba(245,182,66,0.05));
+    border: 1px solid rgba(79,140,247,0.15);
+  }
+  .boss-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(139,108,247,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .boss-hero-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .boss-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, var(--surface2), var(--surface3));
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px;
+    border: 2px solid var(--border2);
+    flex-shrink: 0;
+    animation: boss-idle 3s ease-in-out infinite;
+  }
+  @keyframes boss-idle {
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-6px)}
+  }
+  .boss-info { flex: 1; }
+  .boss-title { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--text3); font-weight: 600; margin-bottom: 4px; }
+  .boss-name { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .boss-name .level-badge {
+    font-size: 12px; font-weight: 700;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    padding: 3px 10px; border-radius: 12px;
+    color: #fff;
+  }
+  .boss-meta { font-size: 13px; color: var(--text2); margin-top: 4px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .boss-meta span { display: flex; align-items: center; gap: 4px; }
+
+  /* ═══════ HP BAR ═══════ */
+  .hp-section {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .hp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .hp-header .hp-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); font-weight: 600; }
+  .hp-header .hp-numbers { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+  .hp-bar-container {
+    height: 32px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+  .hp-bar {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
+    background: linear-gradient(90deg, var(--red2), var(--orange), var(--accent3));
+    position: relative;
+  }
+  .hp-bar.low { background: linear-gradient(90deg, var(--red2), var(--red)); }
+  .hp-bar.medium { background: linear-gradient(90deg, var(--orange), var(--accent3)); }
+  .hp-bar.high { background: linear-gradient(90deg, var(--accent3), var(--accent2)); }
+  .hp-bar-shine {
+    position: absolute; top: 0; left: -50%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shine 3s ease-in-out infinite;
+  }
+  @keyframes shine {
+    0%{left:-50%} 100%{left:150%}
+  }
+  .hp-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    color: #fff;
+  }
+  .hp-details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .hp-detail-item {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .hp-detail-item .val {
+    font-size: 20px; font-weight: 800;
+    font-family: var(--mono);
+  }
+  .hp-detail-item .lbl {
+    font-size: 10px; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .hp-detail-item .val.green { color: var(--accent2); }
+  .hp-detail-item .val.red { color: var(--red); }
+  .hp-detail-item .val.gold { color: var(--accent3); }
+  .hp-detail-item .val.blue { color: var(--accent); }
+  .hp-detail-item .val.purple { color: var(--purple); }
+
+  @media (max-width:640px) {
+    .hp-details { grid-template-columns: repeat(2, 1fr); }
+    .boss-hero-content { flex-direction: column; text-align: center; }
+    .boss-meta { justify-content: center; }
+    .boss-name { justify-content: center; }
+  }
+
+  /* ═══════ BATTLE LOG ═══════ */
+  .section-title {
+    font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .section-title .badge {
+    font-size: 10px; font-weight: 600;
+    background: var(--surface2); color: var(--text2);
+    padding: 2px 10px; border-radius: 10px;
+  }
+
+  .battle-log {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .log-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    animation: log-fade 0.3s ease;
+  }
+  .log-item:last-child { border: none; }
+  @keyframes log-fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .log-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .log-icon.damage { background: rgba(240,101,101,0.12); }
+  .log-icon.heal { background: rgba(59,206,138,0.12); }
+  .log-icon.buff { background: rgba(79,140,247,0.12); }
+  .log-icon.special { background: rgba(245,182,66,0.12); }
+  .log-info { flex: 1; }
+  .log-action { font-size: 14px; font-weight: 600; }
+  .log-action .highlight { color: var(--red2); }
+  .log-action .highlight-green { color: var(--accent2); }
+  .log-meta { font-size: 11px; color: var(--text3); margin-top: 2px; display: flex; gap: 12px; }
+  .log-damage-num {
+    font-family: var(--mono); font-size: 18px; font-weight: 800;
+    padding: 4px 12px; border-radius: 8px;
+    text-align: right;
+  }
+  .log-damage-num.damage { color: var(--red2); background: rgba(240,101,101,0.08); }
+  .log-damage-num.heal { color: var(--accent2); background: rgba(59,206,138,0.08); }
+
+  /* ═══════ EQUIPMENT ═══════ */
+  .equip-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  @media (max-width:900px) { .equip-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width:640px) { .equip-grid { grid-template-columns: 1fr; } }
+  .equip-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .equip-card:hover { border-color: var(--border2); }
+  .equip-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .equip-card .name { font-size: 13px; font-weight: 600; }
+  .equip-card .rarity {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .equip-card .rarity.legendary { color: var(--gold); }
+  .equip-card .rarity.epic { color: var(--purple); }
+  .equip-card .rarity.rare { color: var(--accent); }
+  .equip-card .stats { font-size: 11px; color: var(--text2); margin-top: 6px; }
+
+  /* ═══════ ACHIEVEMENTS ═══════ */
+  .achieve-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  @media (max-width:900px) { .achieve-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width:640px) { .achieve-grid { grid-template-columns: 1fr; } }
+  .achieve-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .achieve-card.unlocked {
+    border-color: rgba(59,206,138,0.3);
+    background: linear-gradient(135deg, rgba(59,206,138,0.06), rgba(79,140,247,0.04));
+  }
+  .achieve-card.locked { opacity: 0.5; }
+  .achieve-card .icon { font-size: 32px; margin-bottom: 6px; }
+  .achieve-card .name { font-size: 12px; font-weight: 600; }
+  .achieve-card .desc { font-size: 10px; color: var(--text3); margin-top: 2px; }
+  .achieve-card .status-badge {
+    font-size: 9px; font-weight: 700;
+    padding: 2px 10px; border-radius: 10px;
+    display: inline-block; margin-top: 6px;
+  }
+  .achieve-card .status-badge.unlocked {
+    background: rgba(59,206,138,0.12); color: var(--accent2);
+  }
+  .achieve-card .status-badge.locked {
+    background: var(--surface2); color: var(--text3);
+  }
+  .achieve-card.unlocked::after {
+    content: '✅';
+    position: absolute; top: 8px; right: 10px;
+    font-size: 16px;
+  }
+
+  /* ═══════ DPS METER ═══════ */
+  .dps-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  @media (max-width:640px) { .dps-section { grid-template-columns: 1fr; } }
+  .dps-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .dps-card .card-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text2); font-weight: 600; margin-bottom: 12px;
+  }
+  .dps-bar-container {
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .dps-bar {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s cubic-bezier(0.22,1,0.36,1);
+  }
+  .dps-bar.actual { background: linear-gradient(90deg, var(--accent), var(--cyan)); }
+  .dps-bar.target { background: linear-gradient(90deg, var(--accent3), var(--orange)); }
+  .dps-stats { display: flex; justify-content: space-between; font-size: 12px; }
+  .dps-stats .label { color: var(--text3); }
+  .dps-stats .value { font-weight: 700; font-family: var(--mono); }
+  .dps-stats .value.ahead { color: var(--accent2); }
+  .dps-stats .value.behind { color: var(--red); }
+
+  /* ═══════ WEEKLY BREAKDOWN ═══════ */
+  .week-breakdown {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .week-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .week-row:last-child { border: none; }
+  .week-row .week-label { font-size: 12px; font-weight: 600; width: 50px; flex-shrink: 0; color: var(--text2); }
+  .week-row .week-bar {
+    flex: 1; height: 24px;
+    background: var(--surface2);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .week-row .week-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s cubic-bezier(0.22,1,0.36,1);
+  }
+  .week-row .week-bar-fill.good { background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  .week-row .week-bar-fill.ok { background: linear-gradient(90deg, var(--accent3), var(--orange)); }
+  .week-row .week-bar-fill.bad { background: linear-gradient(90deg, var(--red2), var(--orange)); }
+  .week-row .week-bar-text {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 8px;
+    font-size: 11px; font-weight: 700; font-family: var(--mono);
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .week-row .week-dmg { font-size: 13px; font-weight: 700; font-family: var(--mono); width: 70px; text-align: right; }
+  .week-row .week-dmg.good { color: var(--accent2); }
+  .week-row .week-dmg.ok { color: var(--accent3); }
+  .week-row .week-dmg.bad { color: var(--red); }
+
+  /* ═══════ COUNTDOWN ═══════ */
+  .countdown-bar {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .countdown-bar .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); font-weight: 600; }
+  .countdown-bar .time {
+    font-family: var(--mono); font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .countdown-bar .sub { font-size: 12px; color: var(--text3); }
+
+  /* ═══════ LOADING / EMPTY ═══════ */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-state .big-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+  /* ═══════ BOSS FLOATING PARTICLES ═══════ */
+  .particles {
+    position: absolute; inset: 0; pointer-events: none;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    animation: float-up 4s ease-in-out infinite;
+  }
+  @keyframes float-up {
+    0%{opacity:0;transform:translateY(20px)}
+    20%{opacity:0.6}
+    80%{opacity:0.3}
+    100%{opacity:0;transform:translateY(-20px)}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ HERO BANNER ═══════ -->
+<div class="boss-hero">
+  <div class="particles">
+    <div class="particle" style="left:10%;animation-delay:0s;background:var(--purple)"></div>
+    <div class="particle" style="left:30%;animation-delay:1s;background:var(--accent)"></div>
+    <div class="particle" style="left:50%;animation-delay:0.5s;background:var(--accent3)"></div>
+    <div class="particle" style="left:70%;animation-delay:1.5s;background:var(--pink)"></div>
+    <div class="particle" style="left:90%;animation-delay:2s;background:var(--cyan)"></div>
+  </div>
+  <div class="boss-hero-content">
+    <div class="boss-icon">🐉</div>
+    <div class="boss-info">
+      <div class="boss-title">⚔️ 最終決戰</div>
+      <div class="boss-name">
+        SUB-150 巨龍
+        <span class="level-badge">Lv.150</span>
+      </div>
+      <div class="boss-meta">
+        <span>🎯 目標: <strong style="color:var(--accent3)">sub-1:50</strong></span>
+        <span>📅 比賽: <strong id="raceDate">Dec 2026</strong></span>
+        <span>🏆 稱號: <strong id="playerTitle">初心者</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ HP BAR ═══════ -->
+<div class="hp-section">
+  <div class="hp-header">
+    <span class="hp-label">❤️ Boss 血量</span>
+    <span class="hp-numbers" id="hpNumbers">0 / 0 HP</span>
+  </div>
+  <div class="hp-bar-container">
+    <div class="hp-bar high" id="hpBar" style="width:0%">
+      <div class="hp-bar-shine"></div>
+    </div>
+    <div class="hp-text" id="hpPercent">0%</div>
+  </div>
+  <div class="hp-details">
+    <div class="hp-detail-item">
+      <div class="val blue" id="totalHPDamage">0</div>
+      <div class="lbl">累積傷害</div>
+    </div>
+    <div class="hp-detail-item">
+      <div class="val red" id="hpRemaining">0</div>
+      <div class="lbl">剩餘 HP</div>
+    </div>
+    <div class="hp-detail-item">
+      <div class="val green" id="currentLevel">Lv.1</div>
+      <div class="lbl">冒險者等級</div>
+    </div>
+    <div class="hp-detail-item">
+      <div class="val gold" id="totalExp">0 km</div>
+      <div class="lbl">累積跑量</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ COUNTDOWN ═══════ -->
+<div class="countdown-bar">
+  <div>
+    <div class="label">⏳ 比賽倒數</div>
+    <div class="sub" id="countdownSub">距離終極決戰</div>
+  </div>
+  <div class="time" id="countdownTime">-- 天</div>
+</div>
+
+<!-- ═══════ DPS METER ═══════ -->
+<div class="dps-section">
+  <div class="dps-card">
+    <div class="card-title">⚔️ 傷害輸出 (DPS)</div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+      <span>你嘅實際 DPS</span>
+      <span>需要 DPS</span>
+    </div>
+    <div class="dps-bar-container">
+      <div class="dps-bar actual" id="dpsActualBar" style="width:0%"></div>
+    </div>
+    <div class="dps-bar-container" style="height:8px">
+      <div class="dps-bar target" id="dpsTargetBar" style="width:0%"></div>
+    </div>
+    <div class="dps-stats">
+      <span><span class="label">你: </span><span class="value" id="dpsActualVal">0</span></span>
+      <span><span class="label">需要: </span><span class="value" id="dpsNeedVal">0</span></span>
+      <span><span class="label">狀態: </span><span class="value" id="dpsStatus">—</span></span>
+    </div>
+  </div>
+  <div class="dps-card">
+    <div class="card-title">📈 屠龍進度</div>
+    <div class="chart-container" style="height:160px">
+      <canvas id="progressChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BATTLE LOG ═══════ -->
+<div class="battle-log">
+  <div class="section-title">
+    ⚔️ 戰鬥記錄
+    <span class="badge" id="logCount">0 次攻擊</span>
+  </div>
+  <div id="battleLogContent">
+    <div class="empty-state">
+      <div class="big-icon">⚔️</div>
+      <p>未有戰鬥記錄... 去跑吓先啦！</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ WEEKLY BREAKDOWN ═══════ -->
+<div class="week-breakdown">
+  <div class="section-title">
+    📊 每週戰績
+    <span class="badge">最近8週</span>
+  </div>
+  <div id="weeklyBreakdown">
+    <div class="empty-state">
+      <div class="big-icon">📊</div>
+      <p>未有數據</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ EQUIPMENT ═══════ -->
+<div class="section-title" style="margin-bottom:10px">
+  🛡️ 裝備
+  <span class="badge">你嘅武器庫</span>
+</div>
+<div class="equip-grid" id="equipmentGrid">
+  <div class="equip-card">
+    <div class="icon">⌚</div>
+    <div class="name">Garmin Forerunner</div>
+    <div class="rarity legendary">⭐ 傳說</div>
+    <div class="stats">+50 數據 / +30 追蹤</div>
+  </div>
+  <div class="equip-card">
+    <div class="icon">👟</div>
+    <div class="name" id="equipShoe">Hoka 跑鞋</div>
+    <div class="rarity epic" id="equipShoeRarity">✦ 史詩</div>
+    <div class="stats" id="equipShoeStats">+20 速度 / +15 緩震</div>
+  </div>
+  <div class="equip-card">
+    <div class="icon">🧴</div>
+    <div class="name">能量 Gel</div>
+    <div class="rarity rare">◆ 稀有</div>
+    <div class="stats">+25 耐力 / 長課 bonus</div>
+  </div>
+  <div class="equip-card">
+    <div class="icon">🎧</div>
+    <div class="name">跑步 Playlist</div>
+    <div class="rarity rare">◆ 稀有</div>
+    <div class="stats">+10 士氣 / 節奏同步</div>
+  </div>
+</div>
+
+<!-- ═══════ ACHIEVEMENTS ═══════ -->
+<div class="section-title" style="margin:16px 0 10px">
+  🏆 成就
+  <span class="badge" id="achieveCount">0/10</span>
+</div>
+<div class="achieve-grid" id="achievementGrid">
+  <div class="achieve-card locked">
+    <div class="icon">🏃</div>
+    <div class="name">輕量級拳手</div>
+    <div class="desc">累積跑量 100km</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">🗺️</div>
+    <div class="name">長征者</div>
+    <div class="desc">單次長課 &gt; 16km</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">⚡</div>
+    <div class="name">加速引擎</div>
+    <div class="desc">配速突破 5:30/km 連續 3km</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">🌙</div>
+    <div class="name">夜跑戰士</div>
+    <div class="desc">10次夜晚跑步</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">❤️</div>
+    <div class="name">Zone 4 王者</div>
+    <div class="desc">心率 Zone4 累積 60 分鐘</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">🎯</div>
+    <div class="name">精準配速師</div>
+    <div class="desc">連續3次Tempo跑配速誤差 &lt;5s</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">💪</div>
+    <div class="name">鐵腿</div>
+    <div class="desc">連續7日都有跑步</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">📏</div>
+    <div class="name">步頻大師</div>
+    <div class="desc">平均步頻 &gt; 170 spm</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">🔥</div>
+    <div class="name">Combo Breaker</div>
+    <div class="desc">一星期完成所有訓練目標</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+  <div class="achieve-card locked">
+    <div class="icon">👑</div>
+    <div class="name">屠龍者</div>
+    <div class="desc">達成 sub-1:50 半馬！</div>
+    <span class="status-badge locked">🔒 未解鎖</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  RPG BOSS FIGHT — CONFIG
+// ═══════════════════════════════════════════════════════════════
+
+const CONFIG = {
+  goalSeconds: 110 * 60,          // sub-1:50 = 6600秒
+  raceDate: '2026-12-31',         // 目標比賽日
+  baseHP: 900,                    // 基礎Boss HP
+  achievements: {
+    '輕量級拳手':  { id: 0, icon: '🏃',  check: d => d.totalKM >= 100 },
+    '長征者':      { id: 1, icon: '🗺️',  check: d => d.longestRun >= 16 },
+    '加速引擎':    { id: 2, icon: '⚡',  check: d => d.fastPace3km },
+    '夜跑戰士':    { id: 3, icon: '🌙',  check: d => d.nightRuns >= 10 },
+    'Zone 4 王者': { id: 4, icon: '❤️',  check: d => d.zone4Total >= 60 },
+    '精準配速師':  { id: 5, icon: '🎯',  check: d => d.preciseTempo >= 3 },
+    '鐵腿':        { id: 6, icon: '💪',  check: d => d.streak7 },
+    '步頻大師':    { id: 7, icon: '📏',  check: d => d.avgCadence >= 170 },
+    'Combo Breaker': { id: 8, icon: '🔥', check: d => d.perfectWeek >= 1 },
+    '屠龍者':      { id: 9, icon: '👑',  check: d => d.killedBoss },
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  DEMO DATA (fallback — real data comes from URL params)
+// ═══════════════════════════════════════════════════════════════
+
+function getDemoData() {
+  return {
+    // 預測數據
+    currentPrediction: 125,       // 分鐘 (2:05)
+    target: 110,                  // 分鐘 (1:50)
+    // 跑量
+    totalKM: 248,
+    weeklyKM: [32, 28, 35, 40, 30, 38, 22, 45],
+    // 配速
+    avgPaceSeconds: 420,          // 7:00/km
+    bestPaceSeconds: 349,         // 5:49/km
+    // 其他
+    longestRun: 18.5,
+    nightRuns: 7,
+    zone4Total: 45,
+    avgCadence: 164,
+    preciseTempo: 1,
+    streak7: false,
+    perfectWeek: 0,
+    killedBoss: false,
+    // 每週傷害
+    weeklyDamage: [120, 95, 140, 165, 110, 150, 80, 180],
+    // 等級
+    level: 6,
+    // 戰鬥記錄
+    battleLog: [
+      { date: '2026-06-28', type: 'long',    desc: '長課 18.5K @6:40',  dmg: 165,  icon: '🗺️' },
+      { date: '2026-06-25', type: 'tempo',   desc: 'Tempo 8K @5:30',   dmg: 140,  icon: '⚡' },
+      { date: '2026-06-22', type: 'interval',desc: 'Interval 400×8',   dmg: 110,  icon: '🔥' },
+      { date: '2026-06-20', type: 'easy',    desc: 'Easy Run 10K @7:00', dmg: 80, icon: '🏃' },
+      { date: '2026-06-18', type: 'tempo',   desc: 'Tempo 6K @5:45',   dmg: 120,  icon: '⚡' },
+      { date: '2026-06-15', type: 'long',    desc: '長課 15K @6:50',   dmg: 130,  icon: '🗺️' },
+      { date: '2026-06-12', type: 'easy',    desc: 'Easy Run 8K @7:15', dmg: 60,  icon: '🏃' },
+      { date: '2026-06-10', type: 'interval',desc: 'Interval 800×6',   dmg: 150,  icon: '🔥' },
+    ]
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN RENDER
+// ═══════════════════════════════════════════════════════════════
+
+function calculateHP(data) {
+  // 將預測時間差距轉做 HP
+  const gapMinutes = data.currentPrediction - data.target; // 15分鐘 = 900秒
+  const gapSeconds = gapMinutes * 60;
+  const maxGap = 30 * 60; // 30分鐘 max
+  const hpRatio = Math.min(gapSeconds / maxGap, 1);
+  const totalHP = Math.round(CONFIG.baseHP * hpRatio) || 1;
+  const dmgPerSecond = (maxGap - gapSeconds) / maxGap * CONFIG.baseHP;
+  const totalDamage = Math.round(Math.max(0, dmgPerSecond));
+  const remaining = Math.max(0, totalHP - totalDamage);
+  return { totalHP, totalDamage, remaining, pct: remaining > 0 ? (remaining / totalHP) * 100 : 0 };
+}
+
+function calcDPS(data) {
+  // 用每週傷害計平均 DPS（每日）
+  const weekly = data.weeklyDamage || [];
+  if (weekly.length === 0) return { actual: 0, needed: 0, status: '—' };
+  const avgWeekly = weekly.reduce((a,b) => a+b, 0) / weekly.length;
+  const actualDPS = avgWeekly / 7;
+  // 需要嘅 DPS：剩餘HP / 剩餘日數
+  const hp = calculateHP(data);
+  const now = new Date();
+  const race = new Date(CONFIG.raceDate);
+  const daysLeft = Math.max(1, Math.round((race - now) / (1000*86400)));
+  const neededDPS = hp.remaining / daysLeft;
+  return {
+    actual: Math.round(actualDPS * 10) / 10,
+    needed: Math.round(neededDPS * 10) / 10,
+    status: actualDPS >= neededDPS ? '✅ 超前' : '⚠️ 落後'
+  };
+}
+
+function calcLevel(data) {
+  const totalKM = data.totalKM || 0;
+  if (totalKM >= 500) return { lv: 10, title: '👑 屠龍者' };
+  if (totalKM >= 300) return { lv: 8, title: '🔥 龍騎士' };
+  if (totalKM >= 200) return { lv: 6, title: '⚔️ 勇者' };
+  if (totalKM >= 100) return { lv: 4, title: '🏃 跑者' };
+  if (totalKM >= 50) return { lv: 2, title: '🚶 見習生' };
+  return { lv: 1, title: '🌱 初心者' };
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function formatPace(secPerKm) {
+  const m = Math.floor(secPerKm / 60);
+  const s = secPerKm % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function render(data) {
+  // ── HP ──
+  const hp = calculateHP(data);
+  document.getElementById('hpNumbers').textContent = `${hp.totalDamage} / ${hp.totalHP} HP`;
+  const hpBar = document.getElementById('hpBar');
+  const pct = hp.pct;
+  hpBar.style.width = (100 - pct) + '%';
+  hpBar.className = 'hp-bar' + (pct > 60 ? ' low' : pct > 30 ? ' medium' : ' high');
+  document.getElementById('hpPercent').textContent = Math.round(pct) + '%';
+  document.getElementById('totalHPDamage').textContent = hp.totalDamage;
+  document.getElementById('hpRemaining').textContent = hp.remaining;
+
+  // ── Level ──
+  const lvl = calcLevel(data);
+  document.getElementById('currentLevel').textContent = `Lv.${lvl.lv}`;
+  document.getElementById('playerTitle').textContent = lvl.title;
+  document.getElementById('totalExp').textContent = `${data.totalKM} km`;
+
+  // ── DPS ──
+  const dps = calcDPS(data);
+  const maxDPS = Math.max(dps.actual, dps.needed, 1) * 1.3;
+  document.getElementById('dpsActualBar').style.width = (dps.actual / maxDPS * 100) + '%';
+  document.getElementById('dpsTargetBar').style.width = (dps.needed / maxDPS * 100) + '%';
+  document.getElementById('dpsActualVal').textContent = `${dps.actual} HP/日`;
+  document.getElementById('dpsNeedVal').textContent = `${dps.needed} HP/日`;
+  const dpsStatus = document.getElementById('dpsStatus');
+  dpsStatus.textContent = dps.status;
+  dpsStatus.className = 'value ' + (dps.actual >= dps.needed ? 'ahead' : 'behind');
+
+  // ── Countdown ──
+  const now = new Date();
+  const race = new Date(CONFIG.raceDate);
+  const daysLeft = Math.max(0, Math.round((race - now) / (1000*86400)));
+  document.getElementById('countdownTime').textContent = `${daysLeft} 天`;
+  document.getElementById('countdownSub').textContent = daysLeft <= 30 ? '🔥 進入衝刺階段！' : '距離終極決戰';
+
+  // ── Battle Log ──
+  const logContent = document.getElementById('battleLogContent');
+  const logs = data.battleLog || [];
+  document.getElementById('logCount').textContent = `${logs.length} 次攻擊`;
+  if (logs.length === 0) {
+    logContent.innerHTML = `<div class="empty-state"><div class="big-icon">⚔️</div><p>未有戰鬥記錄... 去跑吓先啦！</p></div>`;
+  } else {
+    logContent.innerHTML = logs.map(log => {
+      const isDmg = log.dmg > 0;
+      return `
+        <div class="log-item">
+          <div class="log-icon ${log.type === 'long' ? 'special' : log.type === 'tempo' ? 'buff' : log.type === 'interval' ? 'damage' : 'heal'}">${log.icon}</div>
+          <div class="log-info">
+            <div class="log-action">${log.desc} ${log.type === 'tempo' ? '<span class="highlight">💥 暴擊！</span>' : log.type === 'long' ? '<span class="highlight-green">✨ 耐力加成</span>' : ''}</div>
+            <div class="log-meta"><span>📅 ${log.date}</span></div>
+          </div>
+          <div class="log-damage-num damage">-${log.dmg} HP</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Weekly Breakdown ──
+  const weekly = data.weeklyDamage || [];
+  const weeklyKM = data.weeklyKM || [];
+  const wb = document.getElementById('weeklyBreakdown');
+  if (weekly.length === 0) {
+    wb.innerHTML = `<div class="empty-state"><div class="big-icon">📊</div><p>未有數據</p></div>`;
+  } else {
+    const maxW = Math.max(...weekly, 1);
+    wb.innerHTML = weekly.map((dmg, i) => {
+      const km = weeklyKM[i] || 0;
+      const pct = dmg / maxW * 100;
+      const cls = dmg >= 140 ? 'good' : dmg >= 100 ? 'ok' : 'bad';
+      return `
+        <div class="week-row">
+          <div class="week-label">W${i+1}</div>
+          <div class="week-bar">
+            <div class="week-bar-fill ${cls}" style="width:${pct}%"></div>
+            <div class="week-bar-text">${km}km</div>
+          </div>
+          <div class="week-dmg ${cls}">-${dmg} HP</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Achievements ──
+  let achieveUnlocked = 0;
+  Object.entries(CONFIG.achievements).forEach(([name, ach]) => {
+    const card = document.getElementById('achievementGrid').children[ach.id];
+    const unlocked = ach.check(data);
+    card.className = 'achieve-card ' + (unlocked ? 'unlocked' : 'locked');
+    card.querySelector('.status-badge').textContent = unlocked ? '✅ 已解鎖' : '🔒 未解鎖';
+    card.querySelector('.status-badge').className = 'status-badge ' + (unlocked ? 'unlocked' : 'locked');
+    if (unlocked) achieveUnlocked++;
+  });
+  document.getElementById('achieveCount').textContent = `${achieveUnlocked}/${Object.keys(CONFIG.achievements).length}`;
+
+  // ── Progress Chart ──
+  const ctx = document.getElementById('progressChart');
+  if (window._progChart) window._progChart.destroy();
+  const weekLabels = weekly.map((_, i) => `W${i+1}`);
+  const cumDmg = [];
+  let sum = 0;
+  weekly.forEach(d => { sum += d; cumDmg.push(sum); });
+  window._progChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: weekLabels,
+      datasets: [{
+        label: '累積傷害',
+        data: cumDmg,
+        borderColor: '#4f8cf7',
+        backgroundColor: 'rgba(79,140,247,0.1)',
+        fill: true,
+        tension: 0.3,
+        pointBackgroundColor: '#4f8cf7',
+        pointRadius: 4,
+      }, {
+        label: '目標線',
+        data: weekly.map((_, i) => Math.round(hp.totalHP * (i+1) / weekly.length)),
+        borderColor: '#f5b642',
+        borderDash: [6, 4],
+        pointRadius: 0,
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#7e8299', font: { size: 11 } } }
+      },
+      scales: {
+        x: { ticks: { color: '#535770', font: { size: 10 } }, grid: { color: 'rgba(37,41,64,0.3)' } },
+        y: { ticks: { color: '#535770', font: { size: 10 } }, grid: { color: 'rgba(37,41,64,0.3)' } }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  URL PARAM DATA (for embedding in main dashboard)
+// ═══════════════════════════════════════════════════════════════
+
+function loadFromParams() {
+  const params = new URLSearchParams(window.location.search);
+  const data = getDemoData();
+
+  if (params.has('prediction')) data.currentPrediction = parseFloat(params.get('prediction'));
+  if (params.has('totalKM')) data.totalKM = parseFloat(params.get('totalKM'));
+  if (params.has('bestPace')) data.bestPaceSeconds = parseInt(params.get('bestPace'));
+  if (params.has('avgPace')) data.avgPaceSeconds = parseInt(params.get('avgPace'));
+  if (params.has('longestRun')) data.longestRun = parseFloat(params.get('longestRun'));
+  if (params.has('weeklyDamage')) data.weeklyDamage = params.get('weeklyDamage').split(',').map(Number);
+  if (params.has('weeklyKM')) data.weeklyKM = params.get('weeklyKM').split(',').map(Number);
+  if (params.has('raceDate')) CONFIG.raceDate = params.get('raceDate');
+
+  return data;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  const data = loadFromParams();
+  render(data);
+});
+</script>
+
+</body>
+</html>
