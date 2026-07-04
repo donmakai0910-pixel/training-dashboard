@@ -676,8 +676,9 @@ const CONFIG = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-//  DEMO DATA (fallback — real data comes from URL params)
+//  DEMO DATA (fallback — real data comes from URL params or INLINE_RPG_DATA)
 // ═══════════════════════════════════════════════════════════════
+const INLINE_RPG_DATA = {"currentPrediction": 139.1, "totalKM": 248.5, "bestPaceSeconds": 292, "avgPaceSeconds": 460, "longestRun": 13.1, "totalDamage": 5457, "level": 4, "weeklyDamage": [196, 190, 458, 170, 85, 265, 295, 354], "weeklyKM": [7.4, 7.4, 23.9, 8.2, 6.5, 10.0, 18.2, 32.7], "battleLog": [{"date": "2026-06-28", "desc": "跑步機 9.0K @7:57", "dmg": 59, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-27", "desc": "跑步機 10.59K @7:06", "dmg": 175, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-22", "desc": "長課 13.07K @8:34", "dmg": 120, "icon": "🗺️", "type": "長課"}, {"date": "2026-06-20", "desc": "跑步機 10.51K @7:46", "dmg": 136, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-19", "desc": "跑步機 7.67K @5:03", "dmg": 159, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-11", "desc": "tempo 10.03K @6:17", "dmg": 265, "icon": "⚡", "type": "tempo"}, {"date": "2026-06-06", "desc": "跑步機 6.48K @7:21", "dmg": 85, "icon": "🏃", "type": "跑步機"}, {"date": "2026-05-30", "desc": "tempo 8.16K @6:49", "dmg": 170, "icon": "⚡", "type": "tempo"}, {"date": "2026-05-23", "desc": "tempo 9.27K @6:34", "dmg": 202, "icon": "⚡", "type": "tempo"}, {"date": "2026-05-21", "desc": "tempo 7.26K @6:13", "dmg": 207, "icon": "⚡", "type": "tempo"}]};
 
 function getDemoData() {
   return {
@@ -919,7 +920,7 @@ function render(data) {
 
 function loadFromParams() {
   const params = new URLSearchParams(window.location.search);
-  const data = getDemoData();
+  const data = getData();
 
   if (params.has('prediction')) data.currentPrediction = parseFloat(params.get('prediction'));
   if (params.has('totalKM')) data.totalKM = parseFloat(params.get('totalKM'));
