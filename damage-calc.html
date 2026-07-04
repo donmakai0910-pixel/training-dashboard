@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ 戰前預測器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08090e;
+    --surface: #11131e;
+    --surface2: #191c2c;
+    --surface3: #22263b;
+    --border: #252940;
+    --border2: #30344e;
+    --text: #e8ebf2;
+    --text2: #7e8299;
+    --text3: #535770;
+    --accent: #4f8cf7;
+    --accent2: #3bce8a;
+    --accent3: #f5b642;
+    --red: #f06565;
+    --red2: #ff4757;
+    --purple: #8b6cf7;
+    --pink: #f06bc0;
+    --orange: #ff8c42;
+    --cyan: #3bd4e0;
+    --gold: #ffd700;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .section-title {
+    font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .section-title .badge {
+    font-size: 10px; font-weight: 600;
+    background: var(--surface2); color: var(--text2);
+    padding: 2px 10px; border-radius: 10px;
+  }
+
+  /* ── Calculator Card ── */
+  .calc-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width:640px) { .calc-grid { grid-template-columns: 1fr; } }
+
+  .input-group {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .input-group label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text2); font-weight: 600;
+  }
+  .input-group input, .input-group select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus, .input-group select:focus {
+    border-color: var(--accent);
+  }
+  .input-group input::placeholder { color: var(--text3); }
+  .input-group select option { background: var(--surface); color: var(--text); }
+
+  .input-group .hint {
+    font-size: 10px; color: var(--text3);
+  }
+
+  /* ── Result ── */
+  .result-section {
+    background: linear-gradient(135deg, rgba(79,140,247,0.06), rgba(139,108,247,0.08));
+    border: 1px solid rgba(79,140,247,0.15);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .result-damage {
+    font-size: 64px; font-weight: 900;
+    font-family: var(--mono);
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .result-damage.damage { color: var(--red2); }
+  .result-damage.critical { color: var(--accent3); }
+  .result-label {
+    font-size: 12px; color: var(--text2);
+    margin-top: 4px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .result-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  @media (max-width:640px) { .result-detail-grid { grid-template-columns: repeat(2, 1fr); } }
+  .result-detail-item {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .result-detail-item .val {
+    font-size: 18px; font-weight: 800;
+    font-family: var(--mono);
+  }
+  .result-detail-item .lbl {
+    font-size: 10px; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  .damage-breakdown {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .breakdown-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-row:last-child { border: none; }
+  .breakdown-icon { font-size: 20px; width: 40px; text-align: center; }
+  .breakdown-info { flex: 1; }
+  .breakdown-name { font-size: 14px; font-weight: 600; }
+  .breakdown-desc { font-size: 11px; color: var(--text3); }
+  .breakdown-val {
+    font-family: var(--mono); font-size: 18px; font-weight: 800;
+    text-align: right;
+  }
+  .breakdown-val.positive { color: var(--accent2); }
+  .breakdown-val.negative { color: var(--red2); }
+
+  /* ── Preset Buttons ── */
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  @media (max-width:640px) { .preset-grid { grid-template-columns: repeat(2, 1fr); } }
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .preset-btn:hover {
+    border-color: var(--accent);
+    background: rgba(79,140,247,0.06);
+  }
+  .preset-btn .emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+  .preset-btn .name { font-size: 11px; color: var(--text2); font-weight: 400; }
+
+  /* ── DPS Impact ── */
+  .impact-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    margin-top: 16px;
+  }
+  .impact-bar .icon { font-size: 24px; }
+  .impact-bar .info { flex: 1; }
+  .impact-bar .info .lbl { font-size: 11px; color: var(--text3); }
+  .impact-bar .info .val { font-size: 14px; font-weight: 700; }
+  .impact-bar .info .val.green { color: var(--accent2); }
+  .impact-bar .info .val.red { color: var(--red); }
+
+  .calc-btn {
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 14px 24px;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    width: 100%;
+    margin-top: 14px;
+  }
+  .calc-btn:hover { opacity: 0.9; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════ HEADER ═══════ -->
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+  <div style="font-size:36px">⚔️</div>
+  <div>
+    <h1 style="font-size:22px;font-weight:800">戰前預測器</h1>
+    <p style="font-size:12px;color:var(--text2)">跑之前計一計，今次扣幾多血？</p>
+  </div>
+</div>
+
+<!-- ═══════ PRESETS ═══════ -->
+<div class="preset-grid">
+  <button class="preset-btn" onclick="applyPreset('easy')">
+    <span class="emoji">🏃</span>
+    <div>Easy Run</div>
+    <div class="name">8K @7:00</div>
+  </button>
+  <button class="preset-btn" onclick="applyPreset('tempo')">
+    <span class="emoji">⚡</span>
+    <div>Tempo</div>
+    <div class="name">6K @5:30</div>
+  </button>
+  <button class="preset-btn" onclick="applyPreset('interval')">
+    <span class="emoji">🔥</span>
+    <div>Interval</div>
+    <div class="name">400m×8</div>
+  </button>
+  <button class="preset-btn" onclick="applyPreset('long')">
+    <span class="emoji">🗺️</span>
+    <div>長課</div>
+    <div class="name">16K @6:30</div>
+  </button>
+</div>
+
+<!-- ═══════ INPUT ═══════ -->
+<div class="calc-card">
+  <div class="section-title">
+    📋 輸入今次訓練
+    <span class="badge">填完自動計</span>
+  </div>
+  <div class="calc-grid">
+    <div class="input-group">
+      <label>🏃 距離</label>
+      <input type="number" id="distance" value="10" min="1" max="50" step="0.5">
+      <span class="hint">公里 (km)</span>
+    </div>
+    <div class="input-group">
+      <label>⏱️ 預計配速</label>
+      <input type="text" id="pace" value="6:30" placeholder="6:30">
+      <span class="hint">每公里 (mm:ss)</span>
+    </div>
+    <div class="input-group">
+      <label>🏟️ 場地</label>
+      <select id="surface">
+        <option value="road">戶外馬路</option>
+        <option value="treadmill">跑步機</option>
+        <option value="trail">越野</option>
+        <option value="track">運動場</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>🎯 訓練類型</label>
+      <select id="type">
+        <option value="easy">Easy Run</option>
+        <option value="tempo">Tempo / Threshold</option>
+        <option value="interval">Interval / 間歇</option>
+        <option value="long">長課 (Long Run)</option>
+        <option value="recovery">恢復跑</option>
+      </select>
+    </div>
+  </div>
+  <div class="calc-grid" style="margin-top:14px">
+    <div class="input-group">
+      <label>❤️ 預計心率區間</label>
+      <select id="hrZone">
+        <option value="z2">Z2 有氧區 (70-80%)</option>
+        <option value="z3">Z3 節奏區 (80-87%)</option>
+        <option value="z4" selected>Z4 閾值區 (87-93%)</option>
+        <option value="z5">Z5 最大區 (93-100%)</option>
+        <option value="mixed">混合區 (Z2-Z4)</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>👟 步頻 (可選)</label>
+      <input type="number" id="cadence" value="165" min="140" max="200" step="1">
+      <span class="hint">spm — 高步頻有加成</span>
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calculate()">⚡ 預測傷害</button>
+</div>
+
+<!-- ═══════ RESULT ═══════ -->
+<div class="result-section" id="resultSection" style="display:none">
+  <div class="result-label">預計造成傷害</div>
+  <div class="result-damage damage" id="resultDamage">-0 HP</div>
+  <div style="margin-top:6px;font-size:13px;color:var(--text2)" id="resultTag">—</div>
+  <div class="result-detail-grid">
+    <div class="result-detail-item">
+      <div class="val" style="color:var(--accent2)" id="rdBase">0</div>
+      <div class="lbl">基礎傷害</div>
+    </div>
+    <div class="result-detail-item">
+      <div class="val" style="color:var(--gold)" id="rdBonus">0</div>
+      <div class="lbl">倍率加成</div>
+    </div>
+    <div class="result-detail-item">
+      <div class="val" style="color:var(--cyan)" id="rdHr">0</div>
+      <div class="lbl">心率獎勵</div>
+    </div>
+    <div class="result-detail-item">
+      <div class="val" style="color:var(--purple)" id="rdCad">0</div>
+      <div class="lbl">步頻bonus</div>
+    </div>
+  </div>
+
+  <div class="impact-bar">
+    <div class="icon">📊</div>
+    <div class="info">
+      <div class="lbl">對 Boss 嘅影響</div>
+      <div class="val" id="impactText">—</div>
+    </div>
+    <div class="info" style="text-align:right">
+      <div class="lbl">Boss 剩餘 (估)</div>
+      <div class="val" id="bossRemainingAfter" style="font-family:var(--mono)">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BREAKDOWN ═══════ -->
+<div class="damage-breakdown" id="breakdownSection" style="display:none">
+  <div class="section-title">
+    📖 傷害明細
+    <span class="badge">點計出嚟？</span>
+  </div>
+  <div id="breakdownContent"></div>
+</div>
+
+<script>
+const PACE_SECONDS = {
+  '5:30': 330, '6:00': 360, '6:30': 390,
+  '7:00': 420, '7:30': 450, '8:00': 480
+};
+
+const SURFACE_MULT = {
+  road: 1.0,
+  treadmill: 0.85,   // 舒適圈罰則
+  trail: 1.15,       // 越野加成
+  track: 1.05
+};
+
+const TYPE_MULT = {
+  easy: 1.0,
+  tempo: 1.7,
+  interval: 2.0,
+  long: 1.5,
+  recovery: 0.6
+};
+
+const HR_BONUS = {
+  z2: 0,
+  z3: 10,
+  z4: 25,
+  z5: 40,
+  mixed: 15
+};
+
+const CADENCE_BONUS = {
+  140: 0, 145: 2, 150: 5,
+  155: 8, 160: 12, 165: 15,
+  170: 20, 175: 25, 180: 30
+};
+
+function parsePace(str) {
+  if (!str) return 420;
+  if (str.includes(':')) {
+    const [m, s] = str.split(':').map(Number);
+    return m * 60 + (s || 0);
+  }
+  return 420;
+}
+
+function formatPace(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function getCadenceBonus(cadence) {
+  const keys = Object.keys(CADENCE_BONUS).map(Number).sort((a,b) => a-b);
+  let result = 0;
+  for (const k of keys) {
+    if (cadence >= k) result = CADENCE_BONUS[k];
+  }
+  return result;
+}
+
+function calculate() {
+  const dist = parseFloat(document.getElementById('distance').value) || 5;
+  const paceStr = document.getElementById('pace').value.trim();
+  const paceSec = parsePace(paceStr);
+  const paceMin = paceSec / 60;
+  const type = document.getElementById('type').value;
+  const surface = document.getElementById('surface').value;
+  const hrZone = document.getElementById('hrZone').value;
+  const cadence = parseInt(document.getElementById('cadence').value) || 165;
+
+  // ── Base Damage ──
+  const baseDamage = Math.round(dist * 10);
+
+  // ── Pace Multiplier ──
+  let paceMult = 1.0;
+  if (paceSec <= 330) paceMult = 2.2;       // sub-5:30 暴擊
+  else if (paceSec <= 360) paceMult = 1.8;  // 5:30-6:00 重擊
+  else if (paceSec <= 390) paceMult = 1.4;  // 6:00-6:30
+  else if (paceSec <= 420) paceMult = 1.0;  // 6:30-7:00
+  else if (paceSec <= 450) paceMult = 0.8;  // 7:00-7:30 輕拳
+  else paceMult = 0.6;                      // 更慢
+
+  // ── Type Multiplier ──
+  const typeMult = TYPE_MULT[type] || 1.0;
+
+  // ── Surface Multiplier ──
+  const surfMult = SURFACE_MULT[surface] || 1.0;
+
+  // ── Final multiplier ──
+  const totalMult = paceMult * typeMult * surfMult;
+  const multDamage = Math.round(baseDamage * totalMult - baseDamage);
+
+  // ── HR Bonus ──
+  const hrBonus = HR_BONUS[hrZone] || 0;
+
+  // ── Cadence Bonus ──
+  const cadBonus = getCadenceBonus(cadence);
+
+  // ── Total ──
+  const totalDamage = baseDamage + multDamage + hrBonus + cadBonus;
+
+  // ── Display ──
+  document.getElementById('resultSection').style.display = 'block';
+  document.getElementById('breakdownSection').style.display = 'block';
+
+  const dmgEl = document.getElementById('resultDamage');
+  dmgEl.textContent = `-${totalDamage} HP`;
+  dmgEl.className = 'result-damage ' + (totalDamage >= 150 ? 'critical' : 'damage');
+
+  // Tag
+  let tag = '普通攻擊';
+  if (totalDamage >= 250) tag = '🔥 終極必殺技！';
+  else if (totalDamage >= 200) tag = '💥 超暴擊！';
+  else if (totalDamage >= 150) tag = '⚡ 暴擊！';
+  else if (totalDamage >= 100) tag = '強力攻擊';
+  else if (totalDamage >= 50) tag = '普通攻擊';
+  else tag = '輕擊';
+  document.getElementById('resultTag').textContent = tag;
+
+  document.getElementById('rdBase').textContent = `${baseDamage}`;
+  document.getElementById('rdBonus').textContent = `+${multDamage}`;
+  document.getElementById('rdHr').textContent = `+${hrBonus}`;
+  document.getElementById('rdCad').textContent = `+${cadBonus}`;
+
+  // Impact
+  const bossCurrent = 450;  // demo
+  const remaining = Math.max(0, bossCurrent - totalDamage);
+  document.getElementById('bossRemainingAfter').textContent = `${remaining} / ${bossCurrent} HP`;
+  const impactEl = document.getElementById('impactText');
+  if (totalDamage >= 200) impactEl.innerHTML = '<span class="green">🔥 Boss 重創！今日好嘢</span>';
+  else if (totalDamage >= 100) impactEl.innerHTML = '<span class="green">💪 不錯，穩定輸出</span>';
+  else impactEl.innerHTML = '<span class="red">😴 今日養生mode？</span>';
+
+  // ── Breakdown ──
+  const content = document.getElementById('breakdownContent');
+  content.innerHTML = `
+    <div class="breakdown-row">
+      <div class="breakdown-icon">📏</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">基礎傷害</div>
+        <div class="breakdown-desc">距離 ${dist}km × 10</div>
+      </div>
+      <div class="breakdown-val positive">+${baseDamage}</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-icon">⚡</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">配速倍率</div>
+        <div class="breakdown-desc">${formatPace(paceSec)}/km → ×${paceMult.toFixed(1)}</div>
+      </div>
+      <div class="breakdown-val positive">${paceMult > 1 ? '+' : ''}${multDamage}</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-icon">🎯</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">訓練類型加成</div>
+        <div class="breakdown-desc">${type === 'interval' ? '間歇訓練高強度' : type === 'tempo' ? '節奏跑爆發' : type === 'long' ? '長課耐力' : type === 'easy' ? '有氧基礎' : '恢復'} → ×${typeMult.toFixed(1)}</div>
+      </div>
+      <div class="breakdown-val positive">含入倍率</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-icon">🏟️</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">場地係數</div>
+        <div class="breakdown-desc">${surface === 'treadmill' ? '跑步機 — 較舒適 (-15%)' : surface === 'trail' ? '越野 — 難度加成 (+15%)' : surface === 'road' ? '戶外標準' : '運動場 (+5%)'}</div>
+      </div>
+      <div class="breakdown-val ${surface === 'treadmill' ? 'negative' : 'positive'}">×${surfMult.toFixed(2)}</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-icon">❤️</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">心率獎勵</div>
+        <div class="breakdown-desc">${hrZone === 'z5' ? '最大區 — 高強度獎勵' : hrZone === 'z4' ? '閾值區 — 訓練品質高' : hrZone === 'z3' ? '節奏區' : hrZone === 'z2' ? '有氧區 — 基本' : '混合'}</div>
+      </div>
+      <div class="breakdown-val positive">+${hrBonus}</div>
+    </div>
+    <div class="breakdown-row">
+      <div class="breakdown-icon">📏</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name">步頻加成</div>
+        <div class="breakdown-desc">${cadence} spm ${cadence >= 170 ? '🔥 高手步頻！' : cadence >= 160 ? '👍 唔錯' : '可以再練多啲'}</div>
+      </div>
+      <div class="breakdown-val positive">+${cadBonus}</div>
+    </div>
+    <div class="breakdown-row" style="border:none;background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-top:4px">
+      <div class="breakdown-icon">📊</div>
+      <div class="breakdown-info">
+        <div class="breakdown-name" style="font-size:16px">總傷害</div>
+        <div class="breakdown-desc">${dist}km ${formatPace(paceSec)} ${type} ${surface}</div>
+      </div>
+      <div class="breakdown-val negative" style="font-size:24px">-${totalDamage} HP</div>
+    </div>
+  `;
+}
+
+function applyPreset(type) {
+  const presets = {
+    easy:     { dist: 8,  pace: '7:00', type: 'easy',     surface: 'road', hr: 'z2', cad: 160 },
+    tempo:    { dist: 6,  pace: '5:30', type: 'tempo',    surface: 'road', hr: 'z4', cad: 170 },
+    interval: { dist: 3.2, pace: '3:45', type: 'interval', surface: 'track', hr: 'z5', cad: 180 },
+    long:     { dist: 16, pace: '6:30', type: 'long',     surface: 'road', hr: 'z3', cad: 165 }
+  };
+  const p = presets[type];
+  if (!p) return;
+  document.getElementById('distance').value = p.dist;
+  document.getElementById('pace').value = p.pace;
+  document.getElementById('type').value = p.type;
+  document.getElementById('surface').value = p.surface;
+  document.getElementById('hrZone').value = p.hr;
+  document.getElementById('cadence').value = p.cad;
+  calculate();
+}
+
+// Auto-calc on input change
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', calculate);
+  el.addEventListener('change', calculate);
+});
+
+// Run on load
+window.addEventListener('DOMContentLoaded', calculate);
+</script>
+
+</body>
+</html>
