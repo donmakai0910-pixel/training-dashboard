@@ -679,6 +679,28 @@ const CONFIG = {
 //  DEMO DATA (fallback — real data comes from URL params or INLINE_RPG_DATA)
 // ═══════════════════════════════════════════════════════════════
 const INLINE_RPG_DATA = {"currentPrediction": 136.8, "totalKM": 242.3, "bestPaceSeconds": 292, "avgPaceSeconds": 448, "longestRun": 13.1, "totalDamage": 5337, "level": 4, "weeklyDamage": [196, 190, 458, 170, 85, 265, 295, 354], "weeklyKM": [7.4, 7.4, 23.9, 8.2, 6.5, 10.0, 18.2, 32.7], "battleLog": [{"date": "2026-06-28", "desc": "跑步機 9.0K @7:57", "dmg": 59, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-27", "desc": "跑步機 10.59K @7:06", "dmg": 175, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-22", "desc": "長課 13.07K @8:34", "dmg": 120, "icon": "🗺️", "type": "長課"}, {"date": "2026-06-20", "desc": "跑步機 10.51K @7:46", "dmg": 136, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-19", "desc": "跑步機 7.67K @5:03", "dmg": 159, "icon": "🏃", "type": "跑步機"}, {"date": "2026-06-11", "desc": "tempo 10.03K @6:17", "dmg": 265, "icon": "⚡", "type": "tempo"}, {"date": "2026-06-06", "desc": "跑步機 6.48K @7:21", "dmg": 85, "icon": "🏃", "type": "跑步機"}, {"date": "2026-05-30", "desc": "tempo 8.16K @6:49", "dmg": 170, "icon": "⚡", "type": "tempo"}, {"date": "2026-05-23", "desc": "tempo 9.27K @6:34", "dmg": 202, "icon": "⚡", "type": "tempo"}, {"date": "2026-05-21", "desc": "tempo 7.26K @6:13", "dmg": 207, "icon": "⚡", "type": "tempo"}]};
+// Use INLINE_RPG_DATA if available, else demo
+function getTrainingData() {
+  if (INLINE_RPG_DATA && INLINE_RPG_DATA.totalDamage > 0) {
+    // Map inline data to match getDemoData() shape
+    const inline = INLINE_RPG_DATA;
+    const demo = getDemoData();
+    return {
+      ...demo,
+      currentPrediction: inline.currentPrediction,
+      totalKM: inline.totalKM,
+      bestPaceSeconds: inline.bestPaceSeconds,
+      avgPaceSeconds: inline.avgPaceSeconds,
+      longestRun: inline.longestRun,
+      totalDamage: inline.totalDamage,
+      level: inline.level,
+      weeklyDamage: inline.weeklyDamage || demo.weeklyDamage,
+      weeklyKM: inline.weeklyKM || demo.weeklyKM,
+      battleLog: inline.battleLog || demo.battleLog,
+    };
+  }
+  return getDemoData();
+}
 
 function getDemoData() {
   return {
@@ -723,17 +745,17 @@ function getDemoData() {
 // ═══════════════════════════════════════════════════════════════
 
 function calculateHP(data) {
-  // 將預測時間差距轉做 HP
-  const target = data.target || 110; // 110分鐘 = sub-1:50
-  const gapMinutes = Math.max(0, (data.currentPrediction || 125) - target);
-  const gapSeconds = gapMinutes * 60;
-  const maxGap = 30 * 60; // 30分鐘 max
-  const hpRatio = Math.min(gapSeconds / maxGap, 1);
-  const totalHP = Math.max(1, Math.round(CONFIG.baseHP * hpRatio));
-  // 累積傷害 = 每次跑步嘅傷害總和（已由 Python 計好）
-  const totalDamage = Math.min(totalHP, data.totalDamage || Math.round((maxGap - gapSeconds) / maxGap * CONFIG.baseHP));
-  const remaining = Math.max(0, totalHP - totalDamage);
-  return { totalHP, totalDamage, remaining, pct: totalHP > 0 ? (remaining / totalHP) * 100 : 0 };
+  // Boss HP reflects the GAP between current prediction and target
+  const target = data.target || 110;
+  const current = data.currentPrediction || 125;
+  const gapMinutes = Math.max(0, current - target);
+  const maxGap = 30; // 30 minutes max considered
+  const totalHP = Math.max(1, Math.round(900 * Math.min(gapMinutes / maxGap, 1)));
+  // Progress = how much of the max gap has been closed
+  const progress = Math.min(1, Math.max(0, (maxGap - gapMinutes) / maxGap));
+  const damageDealt = Math.round(progress * totalHP);
+  const remaining = totalHP - damageDealt;
+  return { totalHP, totalDamage: damageDealt, remaining, pct: totalHP > 0 ? (remaining / totalHP) * 100 : 0 };
 }
 
 function calcDPS(data) {
@@ -921,7 +943,7 @@ function render(data) {
 
 function loadFromParams() {
   const params = new URLSearchParams(window.location.search);
-  const data = getData();
+  const data = getTrainingData();
 
   if (params.has('prediction')) data.currentPrediction = parseFloat(params.get('prediction'));
   if (params.has('totalKM')) data.totalKM = parseFloat(params.get('totalKM'));
