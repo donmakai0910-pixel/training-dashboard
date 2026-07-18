@@ -64,6 +64,13 @@ body {
     font-size: 11px; color: var(--text2); border: 1px solid var(--border);
 }
 .goal-chip strong { color: var(--accent3); }
+.readiness-chip {
+  padding: 5px 10px; border-radius: 16px;
+  font-size: 11px; font-weight: 600; border: 1px solid var(--border);
+}
+.readiness-chip.green { background: rgba(59,206,138,0.12); color: var(--accent2); border-color: rgba(59,206,138,0.2); }
+.readiness-chip.yellow { background: rgba(245,182,66,0.12); color: var(--accent3); border-color: rgba(245,182,66,0.2); }
+.readiness-chip.red { background: rgba(240,101,101,0.1); color: var(--red); border-color: rgba(240,101,101,0.2); }
 
 /* ── Data Freshness Bar ── */
 .freshness-bar {
