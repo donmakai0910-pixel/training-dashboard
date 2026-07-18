@@ -282,10 +282,23 @@ body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading p { color: var(--text2); font-size: 14px; }
 
-/* ── Trending arrows ── */
+/* ── Trend arrows ── */
 .trend-up { color: var(--accent2); }
 .trend-down { color: var(--red); }
 .trend-flat { color: var(--accent3); }
+
+/* ── Week range pills ── */
+.week-range {
+  display: flex; gap: 4px; margin-left: auto;
+}
+.week-range .pill {
+  padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 600;
+  background: var(--surface2); color: var(--text3); cursor: pointer;
+  border: 1px solid var(--border); transition: all 0.15s;
+  font-family: var(--font);
+}
+.week-range .pill:hover { background: var(--surface3); color: var(--text2); }
+.week-range .pill.active { background: rgba(79,140,247,0.15); color: var(--accent); border-color: rgba(79,140,247,0.3); }
 
 /* ── Skeleton loading ── */
 .skeleton {
